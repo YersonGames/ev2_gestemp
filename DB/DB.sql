@@ -86,3 +86,21 @@ where activo = 1
 end$$
 
 delimiter ;
+
+
+-- Crear tabla departamentos
+create table if no exists departamentos(
+    id_departamento int primary key AUTO_INCREMENT,
+    nombre varchar(100) not null,
+    id_gerente int,
+    foreign key (id_gerente) references Empleado(id_empleado)
+);
+
+
+-- Crear tabla proyectos 
+create table if no exists proyecto(
+    id_proyecto int primary key AUTO_INCREMENT,
+    nombre varchar(100) not null,
+    descripcion text,
+    fecha_inicio date
+);
