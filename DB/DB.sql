@@ -24,7 +24,7 @@ create table if not exists empleado(
     foreign key(id_usuario) references usuario(id_usuario)
 );
 
--- Funcion registrar Usuario
+-- Funcion registrar Usuario/Empleado
 
 delimiter $$
 create procedure sp_empleado_registrar(
