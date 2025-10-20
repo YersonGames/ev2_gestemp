@@ -97,9 +97,9 @@ create table if no exists departamentos(
 );
 
 
--- Crear tabla proyectos 
-create table if no exists proyecto(
-    id_proyecto int primary key AUTO_INCREMENT,
+-- Crear tabla proyectos
+create table if no exists proyectos(
+    id_proyectos int primary key AUTO_INCREMENT,
     nombre varchar(100) not null,
     descripcion text,
     fecha_inicio date
