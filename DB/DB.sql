@@ -70,3 +70,19 @@ begin
     end if;
 end$$
 delimiter ;
+
+delimiter $$
+
+create procedure sp_empleado_listar()
+
+begin
+
+select id_usuario as id_u,
+fecha_inicio,
+salario
+from enpleado
+where activo = 1
+
+end$$
+
+delimiter ;
