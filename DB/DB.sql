@@ -71,22 +71,21 @@ begin
 end$$
 delimiter ;
 
-delimiter $$
+-- Listar empleados
 
+delimiter $$
 create procedure sp_empleado_listar()
 
 begin
-
-select id_usuario as id_u,
-fecha_inicio,
-salario
-from enpleado
-where activo = 1
+    select e.id_usuario as id_u,
+           e.fecha_inicio,
+           e.salario
+    from empleado e
+    inner join usuario u on u.id_usuario = e.id_usuario
+    where u.activo = 1;
 
 end$$
-
 delimiter ;
-
 
 -- Crear tabla departamentos
 create table if no exists departamentos(
