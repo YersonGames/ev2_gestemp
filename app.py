@@ -1,7 +1,12 @@
 import prettytable
 import mysql.connector
-from empleado import Empleado
-from usuario import Usuario
+
+#Clases
+from clases.empleado import Empleado
+from clases.usuario import Usuario
+
+#Servicios
+import RegistroEmpleado
 
 #Crear conexion con base de datos
 def conexionsql():
@@ -14,28 +19,61 @@ def conexionsql():
     )
     return conexion
 
+def mostrar_menu_gestion():
+    print("")
+    menu = prettytable.PrettyTable()
+    menu.field_names = ["","Opciones"]
+    menu.add_rows([
+                    [1,"Registrar/Modificar Empleado"],
+                    [2,"Listar Empelados"],
+                    [0,"Salir"]
+                  ])
+    print(menu)
+
 def main():
     conexion = conexionsql()
-    cursor = conexion.cursor()
-    cursor.execute("select * from usuario")
-    aa = cursor.fetchall()
-    cursor.close()
-    conexion.commit()
+    salir = 1
 
-    table = prettytable.PrettyTable()
-    table.field_names = ["Nombre","Direccion","Telefono","Email","RUN","Contrasena","Permiso","Fecha de Inicio","Salario"]
-    a = Empleado("Hola","hola2","55555","hola2@email.com","222224","contraseña",1,"2025-08-31",15000)
-    table.add_row([a.get_nombre(),a.get_direccion(),a.get_telefono(),a.get_email(),a.get_run(),a.get_contrasenahash(),a.get_permiso(),a.get_fecha_inicio(),a.get_salario()])
+    while salir == 1:
+        mostrar_menu_gestion()
+        opcion = input("Opcion: ")
+
+        if opcion == "1":
+            try:
+                tabla = prettytable.PrettyTable()
+                tabla.field_names = ["Nombre","Direccion","Telefono","Email","RUN","Permiso","Fecha de Inicio","Salario"]
+
+                datos = RegistroEmpleado.registrardatos()
+
+                empleado = Empleado(datos[0],datos[1],datos[2],datos[3],datos[4],datos[5],datos[6],datos[7],datos[8])
+                tabla.add_row([empleado.get_nombre(),empleado.get_direccion(),empleado.get_telefono(),empleado.get_email(),empleado.get_run(),empleado.get_permiso(),empleado.get_fecha_inicio(),empleado.get_salario()])
+
+                parametros = (empleado.get_nombre(),empleado.get_direccion(),empleado.get_telefono(),empleado.get_email(),empleado.get_run(),empleado.get_contrasenahash(),empleado.get_permiso(),empleado.get_fecha_inicio(),empleado.get_salario())
+                cursor = conexion.cursor()
+                cursor.callproc("sp_empleado_registrar",parametros)
+                cursor.close()
+                conexion.commit()
+                print(tabla)
+                print("Empleado registrado correctamente!")
+            except mysql.connector.errors.Error as error:
+                print("Error: ",error)
 
 
-    parametros = (a.get_nombre(),a.get_direccion(),a.get_telefono(),a.get_email(),a.get_run(),a.get_contrasenahash(),a.get_permiso(),a.get_fecha_inicio(),a.get_salario())
-    print(parametros)
-    cursor = conexion.cursor()
-    cursor.callproc("sp_empleado_registrar",parametros)
-    cursor.close()
-    conexion.commit()
+        elif opcion == "2":
 
-    print(table)
-    print(aa)
+            tabla = prettytable.PrettyTable()
+            tabla.field_names = ["ID","Nombre","Direccion","Telefono","Email","RUN","Permiso","Fecha de Inicio","Salario"]
+
+            cursor = conexion.cursor()
+            cursor.callproc("sp_empleado_listar")
+
+            for result in cursor.stored_results():
+                lista = result.fetchall()
+                for l in lista:
+                    tabla.add_row([l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[8]])
+
+            print(tabla)
+            cursor.close()
+            conexion.commit()
     
 main()

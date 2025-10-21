@@ -25,6 +25,7 @@ create table if not exists empleado(
 );
 
 -- Funcion registrar Usuario/Empleado
+drop procedure if exists sp_empleado_registrar;
 
 delimiter $$
 create procedure sp_empleado_registrar(
@@ -72,32 +73,39 @@ end$$
 delimiter ;
 
 -- Listar empleados
+drop procedure if exists sp_empleado_listar;
 
 delimiter $$
 create procedure sp_empleado_listar()
 
 begin
-    select e.id_usuario as id_u,
-           e.fecha_inicio,
-           e.salario
+    select  e.id_empleado,
+            u.nombre,
+            u.direccion,
+            u.telefono,
+            u.email,
+            u.run,
+            u.permiso,
+            e.fecha_inicio,
+            e.salario
     from empleado e
-    inner join usuario u on u.id_usuario = e.id_usuario
+    inner join usuario u on e.id_usuario = u.id_usuario
     where u.activo = 1;
 
 end$$
 delimiter ;
 
 -- Crear tabla departamentos
-create table if no exists departamentos(
+create table if not exists departamentos(
     id_departamento int primary key AUTO_INCREMENT,
     nombre varchar(100) not null,
     id_gerente int,
-    foreign key (id_gerente) references Empleado(id_empleado)
+    foreign key (id_gerente) references empleado(id_empleado)
 );
 
 
 -- Crear tabla proyectos
-create table if no exists proyectos(
+create table if not exists proyectos(
     id_proyectos int primary key AUTO_INCREMENT,
     nombre varchar(100) not null,
     descripcion text,

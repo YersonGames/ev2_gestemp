@@ -1,4 +1,4 @@
-from usuario import Usuario
+from clases.usuario import Usuario
 
 class Empleado(Usuario):
     def __init__(self, nombre, direccion, telefono, email, run, contrasenahash, permiso,fecha_inicio,salario):
