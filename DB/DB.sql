@@ -95,6 +95,110 @@ begin
 end$$
 delimiter ;
 
+-- Buscar empleado
+drop procedure if exists sp_empleado_buscar;
+
+delimiter $$
+create procedure sp_empleado_buscar(
+    in u_nombre varchar(200),
+    out verificar int)
+
+begin
+    declare u_id int;
+
+    select id_usuario into u_id from usuario where activo = 1 and nombre like concat("%",u_nombre,"%") limit 1;
+    
+    if u_id is not null then
+        select  e.id_empleado,
+                u.nombre,
+                u.direccion,
+                u.telefono,
+                u.email,
+                u.run,
+                u.permiso,
+                e.fecha_inicio,
+                e.salario
+        from empleado e
+        inner join usuario u on e.id_usuario = u.id_usuario
+        where u.activo = 1 and u.nombre like concat("%",u_nombre,"%");
+
+        set verificar = u_id;
+    else
+        set verificar = -1;
+    end if;
+
+
+end$$
+delimiter ;
+
+-- Verificar si empleado existe por run
+
+drop procedure if exists sp_empleado_verificar_run;
+
+delimiter $$
+create procedure sp_empleado_verificar_run(
+    in u_run varchar(20),
+    out verificar int)
+begin
+    declare u_id int;
+
+    select id_usuario into u_id from usuario where run = u_run and activo = 1 limit 1;
+
+    if u_id is not null then
+        select  u.nombre,
+                u.direccion,
+                u.telefono,
+                u.email,
+                u.run,
+                u.permiso,
+                e.fecha_inicio,
+                e.salario
+        from empleado e
+        inner join usuario u on e.id_usuario = u.id_usuario
+        where u.activo = 1 and u.run = u_run;
+        set verificar = u_id;
+    else
+        set verificar = -1;
+    end if;
+
+
+end$$
+
+delimiter ;
+
+-- Eliminar Empleado por run
+drop procedure if exists sp_empleado_eliminar_run;
+
+delimiter $$
+
+create procedure sp_empleado_eliminar_run(
+    in u_run varchar(20),
+    out verificar int
+)
+begin
+    declare u_id int;
+
+    select id_usuario into u_id from usuario where run = u_run and activo = 1 limit 1;
+
+    if u_id is not null then
+        update usuario
+        set activo = 0
+        where activo = 1 and run = u_run;
+
+        select nombre
+        from usuario
+        where id_usuario = u_id;
+
+        set verificar = u_id;
+    else
+        set verificar = -1;
+    end if;
+
+
+end$$
+
+delimiter ;
+
 -- Crear tabla departamentos
 create table if not exists departamentos(
     id_departamento int primary key AUTO_INCREMENT,

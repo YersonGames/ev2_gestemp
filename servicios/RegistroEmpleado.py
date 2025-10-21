@@ -1,12 +1,14 @@
 import re
 import hashlib
 import datetime
-import os
 
+#Servicio
+import servicios.LimpiarPantalla as screen
 
 def registrardatos():
     step = 1
 
+    #Ingresar nombre
     while step == 1:
         nombre = input("Nombre completo: ").strip()
         if not nombre:
@@ -14,6 +16,7 @@ def registrardatos():
         else:
             step = 2
 
+    #Ingresar RUN
     while step == 2:
         run = input("\nFormato: (11.111.111-1)\nSi es K reemplace por 0\nRUN: ").strip()
         patron = re.compile(r"^\d\d\.\d\d\d\.\d\d\d-\d$", re.IGNORECASE)
@@ -24,6 +27,8 @@ def registrardatos():
             print("Error: Formato incorrecto (11.111.111-1)")
         else:
             step = 3
+    
+    #Ingresar Email
     while step == 3:
         email = input("Email: ").strip()
         patron = re.compile(r"^[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?$", re.IGNORECASE)
@@ -35,6 +40,7 @@ def registrardatos():
         else:
             step = 4
 
+    #Ingresar Telefono
     while step == 4:
         telefono = input("Numero de telefono: ").strip()
         if not telefono:
@@ -42,6 +48,7 @@ def registrardatos():
         else:
             step = 5
     
+    #Ingresar Direccion
     while step == 5:
         direccion = input("Direccion: ").strip()
 
@@ -50,6 +57,7 @@ def registrardatos():
         else:
             step = 6
     
+    #Ingresar Salario
     while step == 6:
         try:
             salario = float(input("Salario: ").strip())
@@ -58,8 +66,9 @@ def registrardatos():
             else:
                 step = 7
         except ValueError:
-            print("Error: Salario incorrecte, ingrese un numero")
+            print("Error: Salario incorrecto, ingrese un numero")
     
+    #Ingresar Contrasena
     while step == 7:
         contrasena = input("Contraseña: ").strip()
         if not contrasena:
@@ -72,7 +81,6 @@ def registrardatos():
 
     fecha = datetime.datetime.now()
     fechahoy = f"{fecha.year}-{fecha.month}-{fecha.day}"
-
+    screen.clear()
     datos = [nombre,direccion,telefono,email,run,contrasenahash.hexdigest(),1,fechahoy,salario]
-    os.system("clear||cls")
     return datos
