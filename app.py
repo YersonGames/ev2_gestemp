@@ -75,5 +75,7 @@ def main():
             print(tabla)
             cursor.close()
             conexion.commit()
+        elif opcion == "0":
+            salir = 0
     
 main()
