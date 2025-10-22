@@ -152,7 +152,8 @@ begin
                 u.run,
                 u.permiso,
                 e.fecha_inicio,
-                e.salario
+                e.salario,
+                u.contrasenahash
         from empleado e
         inner join usuario u on e.id_usuario = u.id_usuario
         where u.activo = 1 and u.run = u_run;
@@ -198,6 +199,47 @@ begin
 end$$
 
 delimiter ;
+
+-- Funcion Modificar Usuario/Empleado
+drop procedure if exists sp_empleado_modificar_run;
+
+delimiter $$
+create procedure sp_empleado_modificar_run(
+    in u_nombre varchar(200),
+    in u_direccion varchar(100),
+    in u_telefono varchar(20),
+    in u_email varchar(100),
+    in u_run varchar(20),
+    in u_contrasenahash varchar(255),
+    in u_permiso int,
+    in u_fecha_inicio date,
+    in u_salario decimal(12,2)
+)
+begin
+    declare u_id int;
+
+    select id_usuario into u_id from usuario where run = u_run limit 1;
+
+    
+        update usuario
+        set nombre = u_nombre,
+            direccion  = u_direccion,
+            telefono = u_telefono,
+            email = u_email,
+            run = u_run,
+            contrasenahash = u_contrasenahash,
+            permiso = u_permiso,
+            activo = 1
+        where id_usuario = u_id;
+
+        update empleado
+        set fecha_inicio = u_fecha_inicio,
+            salario = u_salario
+        where id_usuario = u_id;
+
+end$$
+delimiter ;
+
 
 -- Crear tabla departamentos
 create table if not exists departamentos(
