@@ -5,8 +5,6 @@ class Empleado(Usuario):
         super().__init__(nombre, direccion, telefono, email, run, contrasenahash, permiso)
         self.fecha_inicio = fecha_inicio
         self.salario = salario
-        self.departamentos = []
-        self.proyectos = []
 
     #Getters
     def get_nombre(self):
@@ -33,6 +31,6 @@ class Empleado(Usuario):
         return self.proyectos
     
     def mostrar_info(self):
-        info = self.nombre,self.direccion,self.telefono,self.email,self.run,self.permiso,self.fecha_inicio,self.salario,self.departamentos,self.proyectos
+        info = self.nombre,self.direccion,self.telefono,self.email,self.run,self.permiso,self.fecha_inicio,self.salario
         return info
     

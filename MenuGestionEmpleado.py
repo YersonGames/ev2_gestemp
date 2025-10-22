@@ -42,7 +42,7 @@ def mostrar_menu_modificar(datos):
                   ])
     print(menu)
 
-def menu_gestion_empelado(connect):
+def menu_gestion_empleado(connect):
     conexion = connect
     salir = 1
     while salir == 1:

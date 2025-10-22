@@ -7,6 +7,7 @@ from clases.usuario import Usuario
 
 #Servicios
 import MenuGestionEmpleado
+import MenuGestionDepartamento
 import servicios.LimpiarPantalla as screen
 
 #Crear conexion con base de datos
@@ -26,7 +27,8 @@ def mostrar_menu1():
     menu = prettytable.PrettyTable()
     menu.field_names = ["","Opciones"]
     menu.add_rows([
-                    [1,"Gestonar Empleados"],
+                    [1,"Gestionar Empleados"],
+                    [2,"Gestionar Departamentos"],
                     [0,"Salir"]
                   ])
     print(menu)
@@ -41,7 +43,9 @@ def main():
 
         #Gestionar empleados
         if opcion == "1":
-            MenuGestionEmpleado.menu_gestion_empelado(conexion)
+            MenuGestionEmpleado.menu_gestion_empleado(conexion)
+        elif opcion == "2":
+            MenuGestionDepartamento.menu_gestion_departamento(conexion)
         elif opcion == "0":
             salir = 0
 

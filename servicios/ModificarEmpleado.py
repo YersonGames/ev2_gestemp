@@ -1,6 +1,5 @@
 import re
 import hashlib
-import datetime
 
 #Servicio
 import servicios.LimpiarPantalla as screen
