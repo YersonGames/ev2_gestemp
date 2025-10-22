@@ -136,7 +136,6 @@ def menu_gestion_empleado(connect):
 
         #Listar empleados
         elif opcion == "4":
-            screen.clear()
             tabla = prettytable.PrettyTable()
             tabla.field_names = ["ID","Nombre","Direccion","Telefono","Email","RUN","Permiso","Fecha de Inicio","Salario"]
 
@@ -146,12 +145,18 @@ def menu_gestion_empleado(connect):
             for result in cursor.stored_results():
                 lista = result.fetchall()
                 for l in lista:
+                    verificar = l
                     tabla.add_row([l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[8]])
 
-            print(tabla)
             cursor.close()
             conexion.commit()
-            input("Presione [ENTER] para volver")
+            if not tabla:
+                screen.clear()
+                print(tabla)
+                input("\nPresione [ENTER] para volver")
+            else:
+                print("\nNo hay empleados registrados")
+                time.sleep(2)
         
         #Buscar empleado por nombre
         elif opcion == "5":
@@ -171,12 +176,13 @@ def menu_gestion_empleado(connect):
                         tabla.add_row([l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[8]])
                 screen.clear()
                 print(tabla)
+                input("\nPresione [ENTER] para volver")
             else:
                 print("\nEmpleado no encontrado")
+                time.sleep(2)
                 
 
             cursor.close()
             conexion.commit()
-            input("Presione [ENTER] para volver")
         elif opcion == "0":
             salir = 0
