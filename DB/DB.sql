@@ -345,7 +345,6 @@ create procedure sp_departamento_modificar(
     in d_id_dep int
 )
 begin
-
         update departamentos
         set nombre = d_nombre,
             descripcion = d_descripcion,
@@ -436,29 +435,46 @@ begin
 end$$
 delimiter ;
 
+-- Verificar si departamento tiene un gerente
+
+drop procedure if exists sp_departamento_verificar_gerente;
+
+delimiter $$
+create procedure sp_departamento_verificar_gerente(
+    in d_id int,
+    out verificar int)
+begin
+    declare d_gerente int;
+
+    select id_gerente into d_gerente from departamentos where id_departamento = d_id and activo = 1 limit 1;
+
+    if d_gerente is not null then
+        set verificar = d_gerente;
+    else
+        set verificar = -1;
+    end if;
+
+end$$
+delimiter ;
+
+
 -- Asignar Gerente a Departamento
 
 drop procedure if exists sp_departamento_asignar_gerente;
 
 delimiter $$
 create procedure sp_departamento_asignar_gerente(
-    in u_run varchar(20),
-    in d_nombre varchar(200),
+    in d_id int,
+    in u_id int,
     out verificar int
 )
 begin
-    declare e_id int;
-    declare u_id int;
-    declare d_id int;
-    declare d_gerente int;
+    update departamentos
+    set id_gerente = u_id
+    where id_departamento = d_id;
 
-    select e.id_empleado, u.id_usuario into e_id, u_id from empleado inner join usuario on e.id_usuario = u.id_usuario where u.run = u_run and u.activo = 1 limit 1;
-
-    if e_id is not null then
-
-
-
-
+end$$
+delimiter ;
 
 -- PROYECTOS
 

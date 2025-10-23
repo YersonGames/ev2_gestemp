@@ -180,15 +180,43 @@ def menu_gestion_departamento(connect):
                 print("\nDepartamento no encontrado")
                 time.sleep(2)
 
-        #Asigar gerente
+        # Asignar gerente
         elif opcion == "6":
             run = input("Ingrese el RUN del empleado: ").strip()
             parametros_empleado = (run,-1)
             cursor = conexion.cursor()
             verificar_empleado = cursor.callproc("sp_empleado_verificar_run",parametros_empleado)
             cursor.close()
+
             if verificar_empleado[-1] != -1:
                 dep_nombre = input("Ingrese el nombre del Departamento: ").strip()
+                parametros_departamento = (dep_nombre,-1)
+                cursor = conexion.cursor()
+                verificar_departamento = cursor.callproc("sp_departamento_verificar_nombre",parametros_departamento)
+                cursor.close()
+
+                if verificar_departamento[-1] != -1:
+                    parametros_gerente = (verificar_departamento[-1],-1)
+                    cursor = conexion.cursor()
+                    verificar_gerente = cursor.callproc("sp_departamento_verificar_gerente",parametros_gerente)
+                    cursor.close()
+
+                    if verificar_gerente[-1] != -1:
+                        parametros_asignar = (verificar_empleado[-1],verificar_departamento[-1],-1)
+                        cursor = conexion.cursor()
+                        cursor.callproc("sp_departamento_asignar_gerente",parametros_asignar)
+                        cursor.close()
+                        print("Gerente asignado correctamente")
+                        time.sleep(2)
+
+                    else:
+                        print("Error: El departamento ya tiene un gerente asignado")
+                        time.sleep(2)
+
+                else:
+                    print("Error: El nombre del departamento no coincide")
+                    time.sleep(2)
+
             else:
                 print("Error: El RUN no coincide con ningun empleado")
                 time.sleep(2)
@@ -197,3 +225,4 @@ def menu_gestion_departamento(connect):
             conexion.commit()
         elif opcion == "0":
             salir = 0
+
