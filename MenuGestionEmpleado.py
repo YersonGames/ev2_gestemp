@@ -150,7 +150,7 @@ def menu_gestion_empleado(connect):
 
             cursor.close()
             conexion.commit()
-            if not tabla:
+            if len(tabla._rows) > 0:
                 screen.clear()
                 print(tabla)
                 input("\nPresione [ENTER] para volver")

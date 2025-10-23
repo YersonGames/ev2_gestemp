@@ -241,14 +241,175 @@ end$$
 delimiter ;
 
 
+-- DEPARTAMENTO
+
 -- Crear tabla departamentos
 create table if not exists departamentos(
     id_departamento int primary key AUTO_INCREMENT,
-    nombre varchar(100) not null,
+    nombre varchar(200) not null,
+    descripcion varchar(300),
+    activo tinyint(1) not null default 1,
     id_gerente int,
     foreign key (id_gerente) references empleado(id_empleado)
 );
 
+
+-- Funcion crear departamento
+drop procedure if exists sp_departamento_crear;
+
+delimiter $$
+create procedure sp_departamento_crear(
+    in d_nombre varchar(200),
+    in d_descripcion varchar(300)
+)
+begin
+    declare d_id int;
+    select id_departamento into d_id from departamentos where nombre = d_nombre limit 1;
+
+    if d_id is null then
+        insert into departamentos(nombre, descripcion, activo)
+        values (d_nombre, d_descripcion,1);
+    else
+        update departamentos
+        set nombre = d_nombre,
+            descripcion = d_descripcion,
+            activo = 1
+        where id_departamento = d_id;
+    end if;
+end$$
+delimiter ;
+
+
+-- Verificar si departamento existe por nombre
+
+drop procedure if exists sp_departamento_verificar_nombre;
+
+delimiter $$
+create procedure sp_departamento_verificar_nombre(
+    in d_nombre varchar(200),
+    out verificar int)
+begin
+    declare d_id int;
+
+    select id_departamento into d_id from departamentos where nombre = d_nombre and activo = 1 limit 1;
+
+    if d_id is not null then
+        select  d.nombre,
+                d.descripcion,
+                d.activo,
+                d.id_gerente
+        from departamentos d
+        where d.activo = 1 and d.id_departamento = d_id;
+        set verificar = d_id;
+    else
+        set verificar = -1;
+    end if;
+end$$
+delimiter ;
+
+-- Funcion Modificar Departamento
+
+drop procedure if exists sp_departamento_modificar_nombre;
+
+delimiter $$
+create procedure sp_departamento_modificar_nombre(
+    in d_nombre varchar(200),
+    in d_descripcion varchar(300)
+)
+begin
+    declare d_id int;
+    select id_departamento into d_id from departamentos where nombre = d_nombre limit 1;
+        update departamentos
+        set nombre = d_nombre,
+            descripcion = d_descripcion,
+            activo = 1
+        where id_departamento = d_id;
+end$$
+delimiter ;
+
+
+
+-- Eliminar departamento por nombre
+drop procedure if exists sp_departamento_eliminar_nombre;
+
+delimiter $$
+
+create procedure sp_departamento_eliminar_nombre(
+    in d_nombre varchar(200),
+    out verificar int
+)
+begin
+    declare d_id int;
+
+    select id_departamento into d_id from departamentos where nombre = d_nombre and activo = 1 limit 1;
+
+    if d_id is not null then
+        update departamentos
+        set activo = 0
+        where activo = 1 and nombre = d_nombre;
+
+        select nombre
+        from departamentos
+        where id_departamento = d_id;
+
+        set verificar = d_id;
+    else
+        set verificar = -1;
+    end if;
+
+end$$
+
+delimiter ;
+
+
+-- Listar departamentos
+drop procedure if exists sp_departamento_listar;
+
+delimiter $$
+create procedure sp_departamento_listar()
+
+begin
+    select  d.id_departamento,
+            d.nombre,
+            d.descripcion,
+            d.id_gerente
+    from departamentos d
+    where d.activo = 1;
+
+end$$
+delimiter ;
+
+
+-- Buscar departamento
+drop procedure if exists sp_departamento_buscar;
+
+delimiter $$
+create procedure sp_departamento_buscar(
+    in d_nombre varchar(200),
+    out verificar int)
+
+begin
+    declare d_id int;
+
+    select id_departamento into d_id from departamentos where activo = 1 and nombre like concat("%",d_nombre,"%") limit 1;
+    
+    if d_id is not null then
+        select  d.id_departamento,
+                d.nombre,
+                d.descripcion,
+                d.id_gerente
+        from departamentos d
+        where d.activo = 1 and d.nombre like concat("%",d_nombre,"%");
+
+        set verificar = d_id;
+    else
+        set verificar = -1;
+    end if;
+
+end$$
+delimiter ;
+
+--
 
 -- Crear tabla proyectos
 create table if not exists proyectos(
