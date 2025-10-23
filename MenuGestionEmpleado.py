@@ -150,8 +150,13 @@ def menu_gestion_empleado(connect):
             cursor.close()
             conexion.commit()
             screen.clear()
-            print(tabla)
-            input("\nPresione [ENTER] para volver")
+            if len(tabla._rows) > 0:
+                screen.clear()
+                print(tabla)
+                input("\nPresione [ENTER] para volver")
+            else:
+                print("\nNo hay empleados registrados")
+                time.sleep(2)
         
         #Buscar empleado por nombre
         elif opcion == "5":

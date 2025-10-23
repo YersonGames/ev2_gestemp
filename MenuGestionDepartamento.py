@@ -83,7 +83,7 @@ def menu_gestion_departamento(connect):
             if verificar[-1] != -1:
                 salir2 = 1
                 while salir2 == 1:
-                    parametros_id = (verificar[-1],)
+                    parametros_id = (verificar[-1],-1)
                     cursor = conexion.cursor()
                     cursor.callproc("sp_departamento_obtener_id",parametros_id)
 

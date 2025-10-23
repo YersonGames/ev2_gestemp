@@ -314,15 +314,24 @@ drop procedure if exists sp_departamento_obtener_id;
 
 delimiter $$
 create procedure sp_departamento_obtener_id(
-    in d_id_dep int)
+    in d_id_dep int,
+    out verificar int)
 begin
+    declare d_id int;
 
-    select  nombre,
-            descripcion,
-            activo,
-            id_gerente
-    from departamentos
-    where activo = 1 and id_departamento = d_id_dep;
+    select id_departamento into d_id from departamentos where id_departamento = d_id_dep and activo = 1 limit 1;
+
+    if d_id is not null then
+        select  nombre,
+                descripcion,
+                activo,
+                id_gerente
+        from departamentos
+        where activo = 1 and id_departamento = d_id_dep;
+        set verificar = d_id;
+    else
+        set verificar = -1;
+    end if;
 end$$
 delimiter ;
 
