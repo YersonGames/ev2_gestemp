@@ -167,7 +167,7 @@ end$$
 
 delimiter ;
 
--- Eliminar Empleado por run
+-- Eliminar Empleado por Run
 drop procedure if exists sp_empleado_eliminar_run;
 
 delimiter $$
@@ -243,7 +243,7 @@ delimiter ;
 
 -- DEPARTAMENTO
 
--- Crear tabla departamentos
+-- Crear tabla Departamentos
 create table if not exists departamentos(
     id_departamento int primary key AUTO_INCREMENT,
     nombre varchar(200) not null,
@@ -253,8 +253,7 @@ create table if not exists departamentos(
     foreign key (id_gerente) references empleado(id_empleado)
 );
 
-
--- Funcion crear departamento
+-- Funcion crear Departamento
 drop procedure if exists sp_departamento_crear;
 
 delimiter $$
@@ -281,7 +280,7 @@ end$$
 delimiter ;
 
 
--- Verificar si departamento existe por nombre
+-- Verificar si Departamento existe por nombre
 
 drop procedure if exists sp_departamento_verificar_nombre;
 
@@ -308,7 +307,7 @@ begin
 end$$
 delimiter ;
 
--- obtener datos departamentos por id
+-- Obtener datos Departamentos por id
 
 drop procedure if exists sp_departamento_obtener_id;
 
@@ -357,7 +356,7 @@ delimiter ;
 
 
 
--- Eliminar departamento por nombre
+-- Eliminar Departamento por nombre
 drop procedure if exists sp_departamento_eliminar_nombre;
 
 delimiter $$
@@ -390,7 +389,7 @@ end$$
 delimiter ;
 
 
--- Listar departamentos
+-- Listar Departamentos
 drop procedure if exists sp_departamento_listar;
 
 delimiter $$
@@ -408,7 +407,7 @@ end$$
 delimiter ;
 
 
--- Buscar departamento
+-- Buscar Departamento
 drop procedure if exists sp_departamento_buscar;
 
 delimiter $$
@@ -437,7 +436,31 @@ begin
 end$$
 delimiter ;
 
---
+-- Asignar Gerente a Departamento
+
+drop procedure if exists sp_departamento_asignar_gerente;
+
+delimiter $$
+create procedure sp_departamento_asignar_gerente(
+    in u_run varchar(20),
+    in d_nombre varchar(200),
+    out verificar int
+)
+begin
+    declare e_id int;
+    declare u_id int;
+    declare d_id int;
+    declare d_gerente int;
+
+    select e.id_empleado, u.id_usuario into e_id, u_id from empleado inner join usuario on e.id_usuario = u.id_usuario where u.run = u_run and u.activo = 1 limit 1;
+
+    if e_id is not null then
+
+
+
+
+
+-- PROYECTOS
 
 -- Crear tabla proyectos
 create table if not exists proyectos(
