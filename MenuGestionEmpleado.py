@@ -145,18 +145,13 @@ def menu_gestion_empleado(connect):
             for result in cursor.stored_results():
                 lista = result.fetchall()
                 for l in lista:
-                    verificar = l
                     tabla.add_row([l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[8]])
 
             cursor.close()
             conexion.commit()
-            if len(tabla._rows) > 0:
-                screen.clear()
-                print(tabla)
-                input("\nPresione [ENTER] para volver")
-            else:
-                print("\nNo hay empleados registrados")
-                time.sleep(2)
+            screen.clear()
+            print(tabla)
+            input("\nPresione [ENTER] para volver")
         
         #Buscar empleado por nombre
         elif opcion == "5":
