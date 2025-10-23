@@ -21,8 +21,8 @@ def mostrar_menu_gestion_departamento():
                     [3,"Eliminar Departamento"],
                     [4,"Listar Departamento"],
                     [5,"Buscar Departamento"],
-                    [6,"Asignar Empleado"],
-                    [7,"Asignar Gerente"],
+                    [6,"Asignar Gerente"],
+                    [7,"Asignar Empleado"],
                     [0,"Volver"]
                   ])
     print(menu)
@@ -178,6 +178,19 @@ def menu_gestion_departamento(connect):
                 input("\nPresione [ENTER] para volver")
             else:
                 print("\nDepartamento no encontrado")
+                time.sleep(2)
+
+        #Asigar gerente
+        elif opcion == "6":
+            run = input("Ingrese el RUN del empleado: ").strip()
+            parametros_empleado = (run,-1)
+            cursor = conexion.cursor()
+            verificar_empleado = cursor.callproc("sp_empleado_verificar_run",parametros_empleado)
+            cursor.close()
+            if verificar_empleado[-1] != -1:
+                dep_nombre = input("Ingrese el nombre del Departamento: ").strip()
+            else:
+                print("Error: El RUN no coincide con ningun empleado")
                 time.sleep(2)
                 
             cursor.close()

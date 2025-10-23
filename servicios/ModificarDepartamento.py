@@ -12,7 +12,7 @@ def modificardatosdepartamento(opcion,datos):
 
     #Ingresar nombre
     while step == "1":
-        nombre = input("Nombre completo: ").strip()
+        nombre = input("Nombre del Departamento: ").strip()
         if not nombre:
             print("Error: El campo esta vacio")
         else:
