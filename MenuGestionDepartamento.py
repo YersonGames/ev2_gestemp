@@ -83,8 +83,9 @@ def menu_gestion_departamento(connect):
             if verificar[-1] != -1:
                 salir2 = 1
                 while salir2 == 1:
+                    parametros_id = (verificar[-1],)
                     cursor = conexion.cursor()
-                    cursor.callproc("sp_departamento_verificar_nombre",parametros)
+                    cursor.callproc("sp_departamento_obtener_id",parametros_id)
 
                     for result in cursor.stored_results():
                         lista = result.fetchall()
@@ -94,12 +95,13 @@ def menu_gestion_departamento(connect):
                     cursor.close()
                     mostrar_menu_modificar_departamento(datos)
                     opcion = input("Opcion: ").strip()
+
                     if opcion != "0":
                         data = ModificarDepartamento.modificardatosdepartamento(opcion,datos)
                         departamento = Departamento(data[0],data[1])
-                        parametrosdepartamento = (departamento.get_nombre(),departamento.get_descripcion(),0)
+                        parametrosdepartamento = (departamento.get_nombre(),departamento.get_descripcion(),verificar[-1])
                         cursor = conexion.cursor()
-                        cursor.callproc("sp_departamento_modificar_nombre",parametrosdepartamento)
+                        cursor.callproc("sp_departamento_modificar",parametrosdepartamento)
                         cursor.close()
                         conexion.commit()
                         print("Datos modificados correctamente")

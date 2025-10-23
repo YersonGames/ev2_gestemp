@@ -264,6 +264,7 @@ create procedure sp_departamento_crear(
 )
 begin
     declare d_id int;
+
     select id_departamento into d_id from departamentos where nombre = d_nombre limit 1;
 
     if d_id is null then
@@ -307,23 +308,41 @@ begin
 end$$
 delimiter ;
 
--- Funcion Modificar Departamento
+-- obtener datos departamentos por id
 
-drop procedure if exists sp_departamento_modificar_nombre;
+drop procedure if exists sp_departamento_obtener_id;
 
 delimiter $$
-create procedure sp_departamento_modificar_nombre(
+create procedure sp_departamento_obtener_id(
+    in d_id_dep int)
+begin
+
+    select  nombre,
+            descripcion,
+            activo,
+            id_gerente
+    from departamentos
+    where activo = 1 and id_departamento = d_id_dep;
+end$$
+delimiter ;
+
+-- Funcion Modificar Departamento
+
+drop procedure if exists sp_departamento_modificar;
+
+delimiter $$
+create procedure sp_departamento_modificar(
     in d_nombre varchar(200),
-    in d_descripcion varchar(300)
+    in d_descripcion varchar(300),
+    in d_id_dep int
 )
 begin
-    declare d_id int;
-    select id_departamento into d_id from departamentos where nombre = d_nombre limit 1;
+
         update departamentos
         set nombre = d_nombre,
             descripcion = d_descripcion,
             activo = 1
-        where id_departamento = d_id;
+        where id_departamento = d_id_dep;
 end$$
 delimiter ;
 
