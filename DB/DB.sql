@@ -131,7 +131,7 @@ begin
 end$$
 delimiter ;
 
--- Verificar si empleado existe por run
+-- Verificar si empleado existe por run, devolver id usuario
 
 drop procedure if exists sp_empleado_verificar_run;
 
@@ -158,6 +158,32 @@ begin
         inner join usuario u on e.id_usuario = u.id_usuario
         where u.activo = 1 and u.run = u_run;
         set verificar = u_id;
+    else
+        set verificar = -1;
+    end if;
+
+
+end$$
+
+delimiter ;
+
+-- Verificar si empleado existe por run, devolver id empleado
+
+drop procedure if exists sp_empleado_verificar_run_idempleado;
+
+delimiter $$
+create procedure sp_empleado_verificar_run_idempleado(
+    in u_run varchar(20),
+    out verificar int)
+begin
+    declare u_id int;
+    declare e_id int;
+
+    select id_usuario into u_id from usuario where run = u_run and activo = 1 limit 1;
+
+    if u_id is not null then
+        select id_empleado into e_id from empleado where id_usuario = u_id limit 1;
+        set verificar = e_id;
     else
         set verificar = -1;
     end if;
@@ -448,8 +474,8 @@ begin
 
     select id_gerente into d_gerente from departamentos where id_departamento = d_id and activo = 1 limit 1;
 
-    if d_gerente is not null then
-        set verificar = d_gerente;
+    if d_gerente is null then
+        set verificar = 1;
     else
         set verificar = -1;
     end if;
@@ -464,8 +490,8 @@ drop procedure if exists sp_departamento_asignar_gerente;
 
 delimiter $$
 create procedure sp_departamento_asignar_gerente(
-    in d_id int,
     in u_id int,
+    in d_id int,
     out verificar int
 )
 begin

@@ -185,7 +185,7 @@ def menu_gestion_departamento(connect):
             run = input("Ingrese el RUN del empleado: ").strip()
             parametros_empleado = (run,-1)
             cursor = conexion.cursor()
-            verificar_empleado = cursor.callproc("sp_empleado_verificar_run",parametros_empleado)
+            verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado",parametros_empleado)
             cursor.close()
 
             if verificar_empleado[-1] != -1:
