@@ -299,8 +299,13 @@ begin
         update departamentos
         set nombre = d_nombre,
             descripcion = d_descripcion,
-            activo = 1
+            activo = 1,
+            id_gerente = null
         where id_departamento = d_id;
+
+        delete from departamento_empleado
+        where id_departamento = d_id;
+
     end if;
 end$$
 delimiter ;
