@@ -22,7 +22,10 @@ def mostrar_menu_gestion_departamento():
                     [4,"Listar Departamento"],
                     [5,"Buscar Departamento"],
                     [6,"Asignar Gerente"],
-                    [7,"Asignar Empleado"],
+                    [7,"Eliminar Gerente"],
+                    [8,"Asignar Empleado"],
+                    [9,"Eliminar Empleado"],
+                    [10,"Listar Empleados"],
                     [0,"Volver"]
                   ])
     print(menu)
@@ -69,8 +72,6 @@ def menu_gestion_departamento(connect):
             except mysql.connector.errors.Error as error:
                 print("Error: ",error)
                 time.sleep(2)
-
-# ---
 
         # Modificar departamento
         elif opcion == "2":
@@ -221,6 +222,115 @@ def menu_gestion_departamento(connect):
                 print("Error: El RUN no coincide con ningun empleado")
                 time.sleep(2)
                 
+        # Eliminar gerente
+        elif opcion == "7":
+            dep_nombre = input("Ingrese el nombre del Departamento: ").strip()
+            parametros_departamento = (dep_nombre,-1)
+            cursor = conexion.cursor()
+            verificar_departamento = cursor.callproc("sp_departamento_verificar_nombre",parametros_departamento)
+            cursor.close()
+
+            if verificar_departamento[-1] != -1:
+                parametros_gerente = (verificar_departamento[-1],-1)
+                cursor = conexion.cursor()
+                verificar_gerente = cursor.callproc("sp_departamento_verificar_gerente",parametros_gerente)
+                cursor.close()
+
+                if verificar_gerente[-1] == -1:
+                    parametros_eliminar_gerente = (verificar_departamento[-1],-1)
+                    cursor = conexion.cursor()
+                    cursor.callproc("sp_departamento_eliminar_gerente",parametros_eliminar_gerente)
+                    cursor.close()
+                    print("Gerente eliminado correctamente")
+                    time.sleep(2)
+                else:
+                    print("Error: El departamento no tiene un gerente asignado")
+                    time.sleep(2)
+                
+            else:
+                print("Error: El nombre del departamento no coincide")
+                time.sleep(2)
+
+        # Asignar empleado a departamento
+        elif opcion == "8":
+            run = input("Ingrese el RUN del empleado: ").strip()
+            parametros_empleado = (run,-1)
+            cursor = conexion.cursor()
+            verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado",parametros_empleado)
+            cursor.close()
+
+            if verificar_empleado[-1] != -1:
+                dep_nombre = input("Ingrese el nombre del Departamento: ").strip()
+                parametros_departamento = (dep_nombre,-1)
+                cursor = conexion.cursor()
+                verificar_departamento = cursor.callproc("sp_departamento_verificar_nombre",parametros_departamento)
+                cursor.close()
+
+                if verificar_departamento[-1] != -1:
+                    parametros_verificacion = (verificar_empleado[-1],-1)
+                    cursor = conexion.cursor()
+                    verificar_empleado_departamento = cursor.callproc("sp_departamento_verificar_empleado_asignado",parametros_verificacion)
+                    cursor.close()
+
+                    if verificar_empleado_departamento[-1] == -1:
+                        parametros_asignar = (verificar_departamento[-1],verificar_empleado[-1],-1)
+                        cursor = conexion.cursor()
+                        cursor.callproc("sp_departamento_asignar_empleado",parametros_asignar)
+                        cursor.close()
+                        print("Empleado asignado correctamente al departamento")
+                        time.sleep(2)
+                    else:
+                        print("Error: El empleado ya esta asignado a un departamento")
+                        time.sleep(2)
+
+                else:
+                    print("Error: El nombre del departamento no coincide")
+                    time.sleep(2)
+
+            else:
+                print("Error: El RUN no coincide con ningun empleado")
+                time.sleep(2)
+
+        # Eliminar empleado de departamento
+        elif opcion == "9":
+            run = input("Ingrese el RUN del empleado: ").strip()
+            parametros_empleado = (run,-1)
+            cursor = conexion.cursor()
+            verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado",parametros_empleado)
+            cursor.close()
+
+            if verificar_empleado[-1] != -1:
+                parametros_eliminar = (verificar_empleado[-1],-1)
+                cursor = conexion.cursor()
+                cursor.callproc("sp_departamento_eliminar_empleado",parametros_eliminar)
+                cursor.close()
+                print("Empleado eliminado correctamente del departamento")
+                time.sleep(2)
+
+        # Listar empleados de un departamento
+        elif opcion == "10":
+            tabla = prettytable.PrettyTable()
+            tabla.field_names = ["ID asignación","ID Departamento","Nombre Departamento","ID Empleado","Nombre Empleado"]
+
+            cursor = conexion.cursor()
+            cursor.callproc("sp_departamento_listar_empleados")
+
+            for result in cursor.stored_results():
+                lista = result.fetchall()
+                for l in lista:
+                    tabla.add_row([l[0],l[1],l[2],l[3],l[4]])
+
+            cursor.close()
+            conexion.commit()
+            if len(tabla._rows) > 0:
+                screen.clear()
+                print(tabla)
+                input("\nPresione [ENTER] para volver")
+            else:
+                print("\nNo hay empleados asignados a departamentos")
+                time.sleep(2)
+
+
             cursor.close()
             conexion.commit()
         elif opcion == "0":

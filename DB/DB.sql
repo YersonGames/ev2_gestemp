@@ -502,6 +502,110 @@ begin
 end$$
 delimiter ;
 
+-- Eliminar Gerente de Departamento
+
+drop procedure if exists sp_departamento_eliminar_gerente;
+
+delimiter $$
+create procedure sp_departamento_eliminar_gerente(
+    in d_id int,
+    out verificar int
+)
+begin
+    update departamentos
+    set id_gerente = null
+    where id_departamento = d_id;
+
+end$$
+delimiter ;
+
+-- Crear tabla Departamento Empleado
+create table if not exists departamento_empleado(
+    id_departamento_empleado int primary key AUTO_INCREMENT,
+    id_departamento int,
+    id_empleado int,
+    foreign key (id_departamento) references departamentos(id_departamento),
+    foreign key (id_empleado) references empleado(id_empleado)
+);
+
+-- Verificar si Empleado ya está asignado a un Departamento
+drop procedure if exists sp_departamento_verificar_empleado_asignado;
+
+delimiter $$
+create procedure sp_departamento_verificar_empleado_asignado(
+    in d_id_empleado int,
+    out verificar int
+)
+begin
+    declare d_asignado int;
+
+    select id_departamento_empleado into d_asignado from departamento_empleado where id_empleado = d_id_empleado;
+
+    if d_asignado is not null then
+        set verificar = 1;
+    else
+        set verificar = -1;
+    end if;
+
+end$$
+delimiter ;
+
+-- Asignar Empleados a Departamento
+
+drop procedure if exists sp_departamento_asignar_empleado;
+
+delimiter $$
+create procedure sp_departamento_asignar_empleado(
+    in d_id_departamento int,
+    in d_id_empleado int,
+    out verificar int
+)
+begin
+    insert into departamento_empleado(id_departamento, id_empleado)
+    values (d_id_departamento, d_id_empleado);
+
+end$$   
+delimiter ;
+
+-- Eliminar Empleado de Departamento
+
+drop procedure if exists sp_departamento_eliminar_empleado;
+
+delimiter $$
+create procedure sp_departamento_eliminar_empleado(
+    in d_id_empleado int,
+    out verificar int
+)
+begin
+    delete from departamento_empleado
+    where id_empleado = d_id_empleado;
+
+    set verificar = 1;
+end$$
+delimiter ;
+
+-- Listar Empleados de un Departamento
+
+drop procedure if exists sp_departamento_listar_empleados;
+
+delimiter $$
+create procedure sp_departamento_listar_empleados()
+begin
+    select de.id_departamento_empleado,
+            d.id_departamento,
+            d.nombre,
+            e.id_empleado,
+            u.nombre
+    from departamento_empleado de
+    inner join departamentos d on de.id_departamento = d.id_departamento
+    inner join empleado e on de.id_empleado = e.id_empleado
+    inner join usuario u on e.id_usuario = u.id_usuario
+    where d.activo = 1;
+
+end$$
+delimiter ;
+
+
 -- PROYECTOS
 
 -- Crear tabla proyectos
