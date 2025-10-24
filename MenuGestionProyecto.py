@@ -37,14 +37,14 @@ def menu_gestion_proyecto(connect):
                 tabla = prettytable.PrettyTable()
                 tabla.field_names = ["Nombre","Descripcion","Fecha de inicio"]
 
-                datos = CrearProyecto.registrardatosproyecto()
+                datos = CrearProyecto.registrardatosproyectos()
 
                 proyecto = Proyecto(datos[0],datos[1], datos[2])
                 tabla.add_row([proyecto.get_nombre(),proyecto.get_descripcion(),proyecto.get_fecha_inicio])
 
                 parametros = (proyecto.get_nombre(),proyecto.get_descripcion,proyecto.get_fecha_inicio())
                 cursor = conexion.cursor()
-                cursor.callproc("sp_proyecto_crear",parametros)
+                cursor.callproc("sp_proyectos_crear",parametros)
                 cursor.close()
                 conexion.commit()
                 print(tabla)
@@ -80,7 +80,7 @@ def menu_gestion_proyecto(connect):
             tabla.field_names = ["ID","Nombre","Descripcion","fecha_inicio"]
 
             cursor = conexion.cursor()
-            cursor.callproc("sp_proyecto_listar")
+            cursor.callproc("sp_proyectos_listar")
 
             for result in cursor.stored_results():
                 lista = result.fetchall()
@@ -108,7 +108,7 @@ def menu_gestion_proyecto(connect):
             parametros = (nombre,-1)
 
             cursor = conexion.cursor()
-            verificar = cursor.callproc("sp_proyecto_buscar",parametros)
+            verificar = cursor.callproc("sp_proyectos_buscar",parametros)
             if verificar[-1] != -1:
                 for result in cursor.stored_results():
                     lista = result.fetchall()

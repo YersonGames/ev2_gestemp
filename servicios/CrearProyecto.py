@@ -5,7 +5,7 @@ import datetime
 # Servicio 
 import servicios.LimpiarPantalla as screen
 
-def registrardatosproyecto():
+def registrardatosproyectos():
     step = 1
 
     # Ingresar nombre
