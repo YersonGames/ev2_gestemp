@@ -613,10 +613,117 @@ delimiter ;
 
 -- PROYECTOS
 
--- Crear tabla proyectos
+-- Crear tabla Proyectos
 create table if not exists proyectos(
-    id_proyectos int primary key AUTO_INCREMENT,
-    nombre varchar(100) not null,
-    descripcion text,
+    id_proyecto int primary key AUTO_INCREMENT,
+    nombre varchar(200) not null,
+    descripcion varchar(300),
+    activo tinyint(1) not null default 1,
     fecha_inicio date
 );
+
+-- Funcion crear Proyecto
+drop procedure if exists sp_proyecto_crear;
+
+delimiter $$
+create procedure sp_proyecto_crear(
+    in p_nombre varchar(200),
+    in p_descripcion varchar(300),
+    in p_fecha_inicio date
+)
+begin
+    declare p_id int;
+    
+    select id_proyecto into p_id from proyecto where nombre = p_nombre limit 1;
+
+    if p_id is null then 
+        insert into proyecto(nombre, descripcion, activo, fecha_inicio)
+        values (p_nombre, p_descripcion, 1, p_fecha_inicio);
+    else 
+        update proyecto
+        set descripcion = p_descripcion,
+            fecha_inicio = p_fecha_inicio,
+            activo = 1
+        where id_proyecto = p_id;
+    end if;
+
+end$$
+delimiter ;
+
+-- Listar Proyecto
+drop procedure if exists sp_proyecto_listar;
+
+delimiter $$
+create procedure sp_proyecto_listar()
+
+begin
+    select p.id_proyecto,
+            p.nombre,
+            p.descripcion,
+            p.fecha_inicio
+    from proyecto p
+    where p.activo = 1;
+
+end$$
+delimiter ;
+
+-- Buscar Proyecto
+drop procedure if exists sp_proyecto_buscar;
+
+delimiter $$
+create procedure sp_proyecto_buscar(
+    in p_nombre varchar(200),
+    out verificar int)
+
+begin 
+    declare p_id int;
+
+    select id_proyecto into p_id from proyecto where activo = 1 and nombre like concat("%",p_nombre,"%") limit 1;
+
+    if p_id is not null then
+        select  p.id_proyecto,
+                p.nombre,
+                p.descripcion,
+                p,fecha_inicio  
+        from proyecto p
+        where p.activo = 1 and p.nombre like concat("%",p_nombre,"%");
+
+        set verificar = p_id;
+    else 
+        set verificar = -1;
+    end if;
+
+end$$ 
+delimiter ;
+
+-- Eliminar Proyecto por nombre
+drop procedure if exists sp_proyecto_eliminar_nombre;
+
+delimiter $$
+
+create procedure sp_proyecto_eliminar_nombre(
+    in p_nombre varchar(200),
+    out verificar int)
+
+begin
+    declare p_id int;
+
+    select id_proyecto into p_id from proyecto where nombre = p_nombre and activo = 1 limit 1;
+
+    if p_id is not null then 
+        update proyecto
+        set activo = 0
+        where activo = 1 and nombre = p_nombre;
+
+        select nombre
+        from proyecto
+        where id_proyecto = p_id; 
+
+        set verificar = p_id;
+    else 
+        set verificar = -1;
+    end if;
+
+end$$
+
+delimiter ;

@@ -8,6 +8,7 @@ from clases.usuario import Usuario
 #Servicios
 import MenuGestionEmpleado
 import MenuGestionDepartamento
+import MenuGestionProyecto
 import servicios.LimpiarPantalla as screen
 
 #Crear conexion con base de datos
@@ -29,6 +30,7 @@ def mostrar_menu1():
     menu.add_rows([
                     [1,"Gestionar Empleados"],
                     [2,"Gestionar Departamentos"],
+                    [3,"Gestionar Proyectos"],
                     [0,"Salir"]
                   ])
     print(menu)
@@ -46,6 +48,8 @@ def main():
             MenuGestionEmpleado.menu_gestion_empleado(conexion)
         elif opcion == "2":
             MenuGestionDepartamento.menu_gestion_departamento(conexion)
+        elif opcion == "3":
+            MenuGestionProyecto.menu_gestion_proyecto(conexion)
         elif opcion == "0":
             salir = 0
 
