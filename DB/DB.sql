@@ -684,7 +684,7 @@ begin
         select  p.id_proyectos,
                 p.nombre,
                 p.descripcion,
-                p,fecha_inicio  
+                p.fecha_inicio  
         from proyectos p
         where p.activo = 1 and p.nombre like concat("%",p_nombre,"%");
 

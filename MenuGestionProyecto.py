@@ -40,9 +40,9 @@ def menu_gestion_proyecto(connect):
                 datos = CrearProyecto.registrardatosproyectos()
 
                 proyecto = Proyecto(datos[0],datos[1], datos[2])
-                tabla.add_row([proyecto.get_nombre(),proyecto.get_descripcion(),proyecto.get_fecha_inicio])
+                tabla.add_row([proyecto.get_nombre(),proyecto.get_descripcion(),proyecto.get_fecha_inicio()])
 
-                parametros = (proyecto.get_nombre(),proyecto.get_descripcion,proyecto.get_fecha_inicio())
+                parametros = (proyecto.get_nombre(),proyecto.get_descripcion(),proyecto.get_fecha_inicio())
                 cursor = conexion.cursor()
                 cursor.callproc("sp_proyectos_crear",parametros)
                 cursor.close()
@@ -60,7 +60,7 @@ def menu_gestion_proyecto(connect):
             parametros = (nombre,-1)
 
             cursor = conexion.cursor()
-            verificar = cursor.callproc("sp_proyecto_eliminar_nombre",parametros)
+            verificar = cursor.callproc("sp_proyectos_eliminar_nombre",parametros)
 
             for result in cursor.stored_results():
                 lista = result.fetchall()
@@ -72,6 +72,8 @@ def menu_gestion_proyecto(connect):
             else:
                 print("El nombre no coincide con ningun proyecto")
 
+            cursor.close()
+            conexion.commit()
             time.sleep(2)
 
         # Listar proyecto
