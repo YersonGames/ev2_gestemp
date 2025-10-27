@@ -9,6 +9,7 @@ from clases.departamento import Departamento
 import servicios.CrearDepartamento as CrearDepartamento
 import servicios.LimpiarPantalla as screen
 import servicios.ModificarDepartamento as ModificarDepartamento
+from servicios.EncriptarDesencriptar import encriptar,desencriptar
 
 def mostrar_menu_gestion_departamento():
     screen.clear()
@@ -158,7 +159,7 @@ def menu_gestion_departamento(connect):
         # Listar departamentos
         elif opcion == "4":
             tabla = prettytable.PrettyTable()
-            tabla.field_names = ["ID","Nombre","Descripcion","ID Gerente"]
+            tabla.field_names = ["ID","Nombre","Descripcion","ID Gerente","Nombre Gerente"]
 
             cursor = conexion.cursor()
             cursor.callproc("sp_departamento_listar")
@@ -167,7 +168,10 @@ def menu_gestion_departamento(connect):
                 lista = result.fetchall()
                 for l in lista:
                     verificar = l
-                    tabla.add_row([l[0],l[1],l[2],l[3]])
+                    if l[4] == None:
+                        tabla.add_row([l[0],l[1],l[2],l[3],l[4]])
+                    else:
+                        tabla.add_row([l[0],l[1],l[2],l[3],desencriptar(l[4])])
 
             cursor.close()
             conexion.commit()
@@ -183,7 +187,7 @@ def menu_gestion_departamento(connect):
         elif opcion == "5":
 
             tabla = prettytable.PrettyTable()
-            tabla.field_names = ["ID","Nombre","Descripcion","ID Gerente"]
+            tabla.field_names = ["ID","Nombre","Descripcion","ID Gerente","Nombre Gerente"]
 
             nombre = input("Ingrese el nombre: ").strip()
             parametros = (nombre,-1)
@@ -194,7 +198,10 @@ def menu_gestion_departamento(connect):
                 for result in cursor.stored_results():
                     lista = result.fetchall()
                     for l in lista:
-                        tabla.add_row([l[0],l[1],l[2],l[3]])
+                        if l[4] == None:
+                            tabla.add_row([l[0],l[1],l[2],l[3],l[4]])
+                        else:
+                            tabla.add_row([l[0],l[1],l[2],l[3],desencriptar(l[4])])
                 screen.clear()
                 print(tabla)
                 input("\nPresione [ENTER] para volver")
@@ -210,14 +217,15 @@ def menu_gestion_departamento(connect):
             while salir3 == 1:
                 mostrar_menu_gestion_gerente()
                 opcion = input("Opcion: ").strip()
+                #Asignar Gerente
                 if opcion == "1":
                     run = input("Ingrese el RUN del empleado: ").strip()
-                    parametros_empleado = (run,-1)
+                    parametros_empleado = (encriptar(run),-1)
                     cursor = conexion.cursor()
-                    verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado",parametros_empleado)
+                    verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado_gerente",parametros_empleado)
                     cursor.close()
 
-                    if verificar_empleado[-1] != -1:
+                    if verificar_empleado[-1] > 0:
                         dep_nombre = input("Ingrese el nombre del Departamento: ").strip()
                         parametros_departamento = (dep_nombre,-1)
                         cursor = conexion.cursor()
@@ -245,10 +253,13 @@ def menu_gestion_departamento(connect):
                         else:
                             print("Error: El nombre del departamento no coincide")
                             time.sleep(2)
-
+                    elif verificar_empleado[-1] == -2:
+                        print("Error: El empleado ya esta asignado como empleado dentro de un departamento")
+                        time.sleep(2)
                     else:
                         print("Error: El RUN no coincide con ningun empleado")
                         time.sleep(2)
+                #Eliminar gerente
                 elif opcion == "2":
                     dep_nombre = input("Ingrese el nombre del Departamento: ").strip()
                     parametros_departamento = (dep_nombre,-1)
@@ -286,14 +297,15 @@ def menu_gestion_departamento(connect):
             while salir4 == 1:
                 mostrar_menu_gestion_empleado_departamento()
                 opcion = input("Opcion: ").strip()
+                #asignar empleado a departamento
                 if opcion == "1":
                     run = input("Ingrese el RUN del empleado: ").strip()
-                    parametros_empleado = (run,-1)
+                    parametros_empleado = (encriptar(run),-1)
                     cursor = conexion.cursor()
-                    verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado",parametros_empleado)
+                    verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado_gerenteempleado",parametros_empleado)
                     cursor.close()
 
-                    if verificar_empleado[-1] != -1:
+                    if verificar_empleado[-1] > 0:
                         dep_nombre = input("Ingrese el nombre del Departamento: ").strip()
                         parametros_departamento = (dep_nombre,-1)
                         cursor = conexion.cursor()
@@ -320,13 +332,17 @@ def menu_gestion_departamento(connect):
                         else:
                             print("Error: El nombre del departamento no coincide")
                             time.sleep(2)
-
+                    elif verificar_empleado[-1] == -2:
+                        print("Error: El empleado ya esta asignado como gerente en un departamento")
+                        time.sleep(2)
                     else:
                         print("Error: El RUN no coincide con ningun empleado")
                         time.sleep(2)
+
+                #Eliminar empleado
                 elif opcion == "2":
                     run = input("Ingrese el RUN del empleado: ").strip()
-                    parametros_empleado = (run,-1)
+                    parametros_empleado = (encriptar(run),-1)
                     cursor = conexion.cursor()
                     verificar_empleado = cursor.callproc("sp_empleado_verificar_run_idempleado",parametros_empleado)
                     cursor.close()
@@ -334,10 +350,16 @@ def menu_gestion_departamento(connect):
                     if verificar_empleado[-1] != -1:
                         parametros_eliminar = (verificar_empleado[-1],-1)
                         cursor = conexion.cursor()
-                        cursor.callproc("sp_departamento_eliminar_empleado",parametros_eliminar)
+                        verificar_eli = cursor.callproc("sp_departamento_eliminar_empleado",parametros_eliminar)
                         cursor.close()
-                        print("Empleado eliminado correctamente del departamento")
-                        time.sleep(2)
+                        conexion.commit()
+                        if verificar_eli[-1] > 0:
+                            print("Empleado eliminado correctamente del departamento")
+                            time.sleep(2)
+                        else:
+                            print("El empleado no esta asignado al departamento")
+                            time.sleep(2)
+                #Listar empleados
                 elif opcion == "3":
                     tabla = prettytable.PrettyTable()
                     tabla.field_names = ["ID asignación","ID Departamento","Nombre Departamento","ID Empleado","Nombre Empleado"]
@@ -348,7 +370,7 @@ def menu_gestion_departamento(connect):
                     for result in cursor.stored_results():
                         lista = result.fetchall()
                         for l in lista:
-                            tabla.add_row([l[0],l[1],l[2],l[3],l[4]])
+                            tabla.add_row([l[0],l[1],l[2],l[3],desencriptar(l[4])])
 
                         cursor.close()
                         conexion.commit()

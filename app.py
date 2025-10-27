@@ -37,6 +37,7 @@ def mostrar_menu1():
 
 def main():
     conexion = conexionsql()
+
     salir = 1
 
     while salir == 1:
