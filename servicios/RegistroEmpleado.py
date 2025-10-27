@@ -1,6 +1,7 @@
 import re
 import hashlib
 import datetime
+from getpass import getpass
 
 #Servicio
 import servicios.LimpiarPantalla as screen
@@ -70,14 +71,19 @@ def registrardatos():
     
     #Ingresar Contrasena
     while step == 7:
-        contrasena = input("Contraseña: ").strip()
+        contrasena = getpass("Contraseña: ").strip()
         if not contrasena:
             print("Error: El campo esta vacio")
         else:
-            data = contrasena.encode("utf-8")
-            contrasenahash = hashlib.sha256()
-            contrasenahash.update(data)
-            step = 0
+            repeat_pass = getpass("Repita la contraseña")
+
+            if repeat_pass == contrasena:
+                data = contrasena.encode("utf-8")
+                contrasenahash = hashlib.sha256()
+                contrasenahash.update(data)
+                step = 0
+            else:
+                print("Contraseña incorrecta!\n")
 
     fecha = datetime.datetime.now()
     fechahoy = f"{fecha.year}-{fecha.month}-{fecha.day}"

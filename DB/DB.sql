@@ -24,6 +24,19 @@ create table if not exists empleado(
     foreign key(id_usuario) references usuario(id_usuario)
 );
 
+-- Crear Tabla Horas Empleado
+create table if not exists empleado_horas(
+    id_empleado_hora int primary key AUTO_INCREMENT,
+    id_empleado int,
+    horas float,
+    foreign key(id_empleado) references empleado(id_empleado)
+);
+
+-- Admin
+delete from usuario where id_usuario = 1;
+insert into usuario(id_usuario,nombre,direccion,telefono,email,run,contrasenahash,permiso,activo)
+values (1,"QWRtaW4=","","","","MjIuMTk4LjgyMy0w","5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",3,1);
+
 -- Funcion registrar Usuario/Empleado
 drop procedure if exists sp_empleado_registrar;
 
@@ -42,32 +55,38 @@ create procedure sp_empleado_registrar(
 begin
     declare u_id int;
     declare u_tid int;
+    declare u_adid int;
 
     select id_usuario into u_id from usuario where run = u_run limit 1;
+    select id_usuario into u_adid from usuario where run = u_run and permiso = 3 limit 1;
 
     if u_id is null then
-        insert into usuario(nombre, direccion, telefono, email,run,contrasenahash,permiso,activo)
-        values (u_nombre, u_direccion, u_telefono,u_email,u_run,u_contrasenahash,u_permiso,1);
+        if u_adid is null then
+            insert into usuario(nombre, direccion, telefono, email,run,contrasenahash,permiso,activo)
+            values (u_nombre, u_direccion, u_telefono,u_email,u_run,u_contrasenahash,u_permiso,1);
 
-        set u_tid = LAST_INSERT_ID();
-        insert into empleado(id_usuario,fecha_inicio,salario)
-        values (u_tid,u_fecha_inicio,u_salario);
+            set u_tid = LAST_INSERT_ID();
+            insert into empleado(id_usuario,fecha_inicio,salario)
+            values (u_tid,u_fecha_inicio,u_salario);
+        end if;
     else
-        update usuario
-        set nombre = u_nombre,
-            direccion  = u_direccion,
-            telefono = u_telefono,
-            email = u_email,
-            run = u_run,
-            contrasenahash = u_contrasenahash,
-            permiso = u_permiso,
-            activo = 1
-        where id_usuario = u_id;
+        if u_adid is null then
+            update usuario
+            set nombre = u_nombre,
+                direccion  = u_direccion,
+                telefono = u_telefono,
+                email = u_email,
+                run = u_run,
+                contrasenahash = u_contrasenahash,
+                permiso = u_permiso,
+                activo = 1
+            where id_usuario = u_id;
 
-        update empleado
-        set fecha_inicio = u_fecha_inicio,
-            salario = u_salario
-        where id_usuario = u_id;
+            update empleado
+            set fecha_inicio = u_fecha_inicio,
+                salario = u_salario
+            where id_usuario = u_id;
+        end if;
     end if;
 end$$
 delimiter ;
@@ -141,10 +160,13 @@ create procedure sp_empleado_verificar_run(
     out verificar int)
 begin
     declare u_id int;
+    declare e_id int;
 
-    select id_usuario into u_id from usuario where run = u_run and activo = 1 limit 1;
+    select id_usuario into u_id from usuario where run = u_run and activo = 1 and permiso != 3 limit 1;
 
     if u_id is not null then
+    select id_empleado into e_id from empleado where id_usuario = u_id limit 1;
+
         select  u.nombre,
                 u.direccion,
                 u.telefono,
@@ -157,7 +179,7 @@ begin
         from empleado e
         inner join usuario u on e.id_usuario = u.id_usuario
         where u.activo = 1 and u.run = u_run;
-        set verificar = u_id;
+        set verificar = e_id;
     else
         set verificar = -1;
     end if;
@@ -267,7 +289,7 @@ begin
     declare e_id int;
     declare e_idg int;
 
-    select id_usuario into u_id from usuario where run = u_run and activo = 1 limit 1;
+    select id_usuario into u_id from usuario where run = u_run and activo = 1 and permiso != 3 limit 1;
 
     if u_id is not null then
         select id_empleado into e_id from empleado where id_usuario = u_id limit 1;
@@ -300,7 +322,7 @@ begin
     declare u_id int;
     declare e_id int;
 
-    select id_usuario into u_id from usuario where run = u_run and activo = 1 limit 1;
+    select id_usuario into u_id from usuario where run = u_run and activo = 1 and permiso != 3 limit 1;
 
     if u_id is not null then
         select id_empleado into e_id from empleado where id_usuario = u_id limit 1;
@@ -406,4 +428,85 @@ begin
         where id_usuario = u_id;
 
 end$$
+delimiter ;
+
+-- Verificar e inciar sesion usuario
+drop procedure if exists sp_usuario_login;
+
+delimiter $$
+
+create procedure sp_usuario_login(
+    in u_run text,
+    in u_contrasenahash text,
+    out verificar_id int,
+    out verificar_permiso int,
+    out verificar_nombre text
+)
+begin
+
+    declare u_id int;
+    declare u_per int;
+    declare u_nom text;
+
+    select id_usuario into u_id from usuario where run = u_run limit 1;
+    select permiso into u_per from usuario where contrasenahash = u_contrasenahash limit 1;
+    select nombre into u_nom from usuario where run = u_run limit 1;
+
+
+    if u_id is not null then
+
+        if u_per is not null then
+
+            set verificar_id = u_id;
+            set verificar_permiso = u_per;
+            set verificar_nombre = u_nom;
+        else
+            set verificar_id = -1;
+            set verificar_permiso = -1;
+            set verificar_nombre = "Error";
+        end if;
+
+    else
+            set verificar_id = -1;
+            set verificar_permiso = -1;
+            set verificar_nombre = "Error";
+
+    end if;
+
+end$$
+
+delimiter ;
+
+-- Funcion Registrar horas empleados
+drop procedure if exists sp_empleado_registrar_horas;
+
+delimiter $$
+
+create procedure sp_empleado_registrar_horas(
+    in u_id int,
+    in e_horas float,
+    out verificar int
+)
+begin
+
+    declare e_id int;
+    declare eh_id int;
+
+    select id_empleado into e_id from empleado where id_usuario = u_id limit 1;
+    select id_empleado into eh_id from empleado_horas where id_empleado = e_id limit 1;
+
+    if eh_id is null then
+        insert empleado_horas(id_empleado,horas)
+        values (e_id,e_horas);
+        set verificar = eh_id;
+    else
+        update empleado_horas
+        set horas = horas+e_horas
+        where id_empleado = e_id;
+        set verificar = e_id;
+    end if;
+
+
+end $$
+
 delimiter ;

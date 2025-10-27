@@ -46,8 +46,8 @@ def mostrar_menu_gestion_empleado():
     menu.field_names = ["","Opciones"]
     menu.add_rows([
                     [1,"Asignar Empleado a Proyecto"],
-                    [2,"Eliminar Empelado a Proyecto"],
-                    [3,"Listar Empleados a Proyectos"],
+                    [2,"Eliminar Empleado de Proyecto"],
+                    [3,"Listar Empleados en Proyectos"],
                     [0,"Volver"]
                   ])
     print(menu)
@@ -271,6 +271,7 @@ def menu_gestion_proyecto(connect):
                         print("El RUN no coincide con ningun empleado")
                         time.sleep(2)
 
+                #Listar empelados en proyectos
                 elif opcion == "3":
                     lista_empro = prettytable.PrettyTable()
 
