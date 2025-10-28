@@ -75,7 +75,7 @@ def registrardatos():
         if not contrasena:
             print("Error: El campo esta vacio")
         else:
-            repeat_pass = getpass("Repita la contraseña")
+            repeat_pass = getpass("Repita la contraseña: ")
 
             if repeat_pass == contrasena:
                 data = contrasena.encode("utf-8")
