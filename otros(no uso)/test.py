@@ -1,6 +1,5 @@
-from prompt_toolkit import prompt
+import datetime
 
-texto_completo = prompt(">> ", multiline=True)
-
-print("\n--- Tu texto completo ---")
-print(texto_completo)
+date = datetime.date(1899, 12, 30)
+date2 = date + datetime.timedelta(days=45991)
+print(date2)

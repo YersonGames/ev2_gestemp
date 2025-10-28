@@ -559,7 +559,8 @@ begin
 
     select  e.id_empleado,
             u.nombre,
-            er.horas
+            er.horas,
+            er.fecha_registro
     from empleado e
     left join usuario u on e.id_usuario = u.id_usuario
     left join empleado_registro er on e.id_empleado = er.id_empleado
