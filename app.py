@@ -1,6 +1,9 @@
 import prettytable
 import mysql.connector
 import hashlib
+import re
+import time
+import datetime
 from getpass import getpass
 
 #Clases
@@ -14,6 +17,7 @@ import MenuGestionProyecto
 import servicios.LimpiarPantalla as screen
 from servicios.EncriptarDesencriptar import encriptar,desencriptar
 import servicios.RegistrarHora as RegistrarHora
+import servicios.ExportarRegistro as ExportarRegistro
 
 #Crear conexion con base de datos
 def conexionsql():
@@ -43,11 +47,13 @@ def mostrar_menu(nombre,permiso):
                         [1,"Gestionar Empleados"],
                         [2,"Gestionar Departamentos"],
                         [3,"Gestionar Proyectos"],
+                        [4,"Exportar Registro"],
                         [0,"Salir"]
                     ])
     elif permiso == 1 or permiso == 2:
         menu.add_rows([
                     [1,"Ingresar Horas"],
+                    [2,"Ver Registro Horas"],
                     [0,"Salir"]
                   ])
     print(menu)
@@ -122,6 +128,8 @@ def main():
                     MenuGestionDepartamento.menu_gestion_departamento(conexion)
                 elif opcion == "3":
                     MenuGestionProyecto.menu_gestion_proyecto(conexion)
+                elif opcion == "4":
+                    ExportarRegistro.exportar_registro(conexion)
                 elif opcion == "0":
                     salir = 0
                     login = 1
@@ -130,6 +138,39 @@ def main():
                 opcion = input("Opcion: ").strip()
                 if opcion == "1":
                     RegistrarHora.registrar_horas(conexion,verificar_login[2])
+                elif opcion == "2":
+                    fecha = input("Formato (XXXX-XX) Año-Mes\nIngresar Fecha de Resgistros: ")
+                    patron = re.compile(r"^\d\d\d\d-\d\d$", re.IGNORECASE)
+                    patron2 = patron.match(fecha)
+
+                    if not fecha:
+                        print("Error: El campo esta vacio")
+                        time.sleep(2)
+                    elif not patron2:
+                        print("Error: Formato incorrecto")
+                        time.sleep(2)
+                    else:
+                        fechames = f"{fecha}-01"
+                        parametros = (verificar_login[2],fechames,-1)
+                        cursor = conexion.cursor()
+                        verificar_registro = cursor.callproc("sp_empleado_obtener_registro",parametros)
+
+                        if verificar_registro[-1] > 0:
+                            for result in cursor.stored_results():
+                                lista = result.fetchall()
+                                for l in lista:
+                                    data = l[0]
+                            cursor.close()
+                            tabla_registro = prettytable.PrettyTable()
+                            tabla_registro.field_names = ["Fecha","Total Horas"]
+                            tabla_registro.add_row([fecha,datetime.timedelta(seconds=data)])
+                            print(tabla_registro)
+                            input("\nPresione [ENTER] para volver")
+                            conexion.commit()
+
+                        else:
+                            print("Error: No existe registro")
+                            time.sleep(2)
                 elif opcion == "0":
                     salir = 0
                     login = 1

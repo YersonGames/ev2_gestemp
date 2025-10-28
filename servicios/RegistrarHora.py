@@ -46,8 +46,10 @@ def registrar_horas(connect,id_usuario):
 
             if dato2 > dato1:
                 data = (dato2-dato1).total_seconds()
-                print(f"Horas trabajas: {datetime.timedelta(seconds=data)}")
-                parametros = (id_usuario,data,-1)
+                print(f"Horas trabajadas: {datetime.timedelta(seconds=data)}")
+                fecha = datetime.datetime.now()
+                fechahoy = f"{fecha.year}-{fecha.month}-{fecha.day}"
+                parametros = (id_usuario,data,fechahoy,-1)
                 cursor = conexion.cursor()
                 verificar = cursor.callproc("sp_empleado_registrar_horas",parametros)
                 cursor.close()

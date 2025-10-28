@@ -1,6 +1,7 @@
 import re
 import hashlib
 import datetime
+from prompt_toolkit import prompt
 
 #Servicio
 import servicios.LimpiarPantalla as screen
@@ -18,8 +19,9 @@ def registrardatosdepartamento():
 
     #Ingresar Descripcion
     while step == 2:
-        descripcion = input("Descripción: ").strip()
-
+        #descripcion = input("Descripción: ").strip()
+        print("Presiona [ESC]+[ENTER] para enviar.\nDescripcion:")
+        descripcion = prompt(">> ", multiline=True).strip()
         if not descripcion:
             print("Error: El campo esta vacio")
         else:

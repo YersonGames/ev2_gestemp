@@ -58,7 +58,8 @@ begin
             p.descripcion,
             p.fecha_inicio
     from proyectos p
-    where p.activo = 1;
+    where p.activo = 1
+    order by p.id_proyecto asc;
 
 end$$
 delimiter ;

@@ -174,7 +174,8 @@ begin
     from departamentos d
     left join empleado e on d.id_gerente = e.id_empleado
     left join usuario u on e.id_usuario = u.id_usuario
-    where d.activo = 1;
+    where d.activo = 1
+    order by d.id_departamento asc;
 
 end$$
 delimiter ;

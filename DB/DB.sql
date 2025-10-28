@@ -25,10 +25,11 @@ create table if not exists empleado(
 );
 
 -- Crear Tabla Horas Empleado
-create table if not exists empleado_horas(
+create table if not exists empleado_registro(
     id_empleado_hora int primary key AUTO_INCREMENT,
     id_empleado int,
     horas float,
+    fecha_registro date,
     foreign key(id_empleado) references empleado(id_empleado)
 );
 
@@ -109,7 +110,8 @@ begin
             e.salario
     from empleado e
     inner join usuario u on e.id_usuario = u.id_usuario
-    where u.activo = 1;
+    where u.activo = 1
+    order by e.id_empleado asc;
 
 end$$
 delimiter ;
@@ -341,6 +343,9 @@ begin
         delete from departamento_empleado
         where id_empleado = e_id;
 
+        delete from empleado_registro
+        where id_empleado = e_id;
+
         set verificar = u_id;
     else
         set verificar = -1;
@@ -485,6 +490,7 @@ delimiter $$
 create procedure sp_empleado_registrar_horas(
     in u_id int,
     in e_horas float,
+    in eh_fecha date,
     out verificar int
 )
 begin
@@ -493,14 +499,14 @@ begin
     declare eh_id int;
 
     select id_empleado into e_id from empleado where id_usuario = u_id limit 1;
-    select id_empleado into eh_id from empleado_horas where id_empleado = e_id limit 1;
+    select id_empleado into eh_id from empleado_registro where id_empleado = e_id and year(fecha_registro) = year(eh_fecha) and month(fecha_registro) = month(eh_fecha) limit 1;
 
     if eh_id is null then
-        insert empleado_horas(id_empleado,horas)
-        values (e_id,e_horas);
+        insert empleado_registro(id_empleado,horas,fecha_registro)
+        values (e_id,e_horas,eh_fecha);
         set verificar = eh_id;
     else
-        update empleado_horas
+        update empleado_registro
         set horas = horas+e_horas
         where id_empleado = e_id;
         set verificar = e_id;
@@ -510,3 +516,56 @@ begin
 end $$
 
 delimiter ;
+
+-- Devolver Registro de horas por anio-mes
+drop procedure if exists sp_empleado_obtener_registro;
+
+delimiter $$
+
+create procedure sp_empleado_obtener_registro(
+    in u_id int,
+    in eh_fecha date,
+    out verificar int
+)
+begin
+
+    declare eh_id int;
+    declare e_id int;
+    
+    select id_empleado into e_id from empleado where id_usuario = u_id limit 1;
+    select id_empleado_hora into eh_id from empleado_registro where id_empleado = e_id and year(fecha_registro) = year(eh_fecha) and month(fecha_registro) = month(eh_fecha) limit 1;
+
+    if eh_id is not null then
+        select horas
+        from empleado_registro
+        where id_empleado_hora = eh_id;
+        set verificar = eh_id;
+    else
+        set verificar = -1;
+    end if;
+
+end$$
+
+delimiter ;
+
+
+-- Listar datos Registro, empleados
+drop procedure if exists sp_empleado_listar_registro;
+
+delimiter $$
+
+create procedure sp_empleado_listar_registro()
+begin
+
+    select  e.id_empleado,
+            u.nombre,
+            er.horas
+    from empleado e
+    left join usuario u on e.id_usuario = u.id_usuario
+    left join empleado_registro er on e.id_empleado = er.id_empleado
+    order by e.id_empleado asc;
+
+end$$
+
+delimiter ;
+

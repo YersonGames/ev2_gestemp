@@ -1,5 +1,6 @@
 import re
 import hashlib
+from prompt_toolkit import prompt
 
 #Servicio
 import servicios.LimpiarPantalla as screen
@@ -20,7 +21,8 @@ def modificardatosdepartamento(opcion,datos):
     
     #Ingresar Descripcion
     while step == "2":
-        descripcion = input("Descripcion: ").strip()
+        print("Presiona [ESC]+[ENTER] para enviar.\nDescripcion:")
+        descripcion = prompt(">> ", multiline=True).strip()
 
         if not descripcion:
             print("Error: El campo esta vacio")
