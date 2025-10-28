@@ -1,3 +1,4 @@
 pip install mysql-connector
 pip install prettytable
 pip install prompt_toolkit
+pip install xlsxwriter
