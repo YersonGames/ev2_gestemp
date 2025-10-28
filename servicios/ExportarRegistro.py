@@ -1,6 +1,7 @@
 #Librerias
 import xlsxwriter
 import datetime
+import time
 
 #Servicios
 from servicios.EncriptarDesencriptar import encriptar,desencriptar
@@ -58,3 +59,6 @@ def exportar_registro(connect):
 
     hoja.autofit()
     file.close()
+
+    print("El registro 'Registro.xlsx' exportado correctamento!")
+    time.sleep(2)

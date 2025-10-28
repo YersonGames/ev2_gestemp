@@ -134,8 +134,12 @@ create procedure sp_departamento_eliminar_nombre(
 )
 begin
     declare d_id int;
+    declare e_id int;
+    declare u_id int;
 
     select id_departamento into d_id from departamentos where nombre = d_nombre and activo = 1 limit 1;
+    select id_gerente into e_id from departamentos where id_departamento = d_id limit 1;
+    select id_usuario into u_id from empleado where id_empleado = e_id limit 1;
 
     if d_id is not null then
         update departamentos
@@ -148,6 +152,10 @@ begin
 
         delete from departamento_empleado
         where id_departamento = d_id;
+
+        update usuario
+        set permiso = 1
+        where id_usuario = u_id;
 
         set verificar = d_id;
     else
@@ -247,9 +255,17 @@ create procedure sp_departamento_asignar_gerente(
     out verificar int
 )
 begin
+    declare u_id int;
+
+    select id_usuario into u_id from empleado where id_empleado = e_id limit 1;
+
     update departamentos
     set id_gerente = e_id
     where id_departamento = d_id;
+
+    update usuario
+    set permiso = 2
+    where id_usuario = u_id;
 
 end$$
 delimiter ;
@@ -264,9 +280,19 @@ create procedure sp_departamento_eliminar_gerente(
     out verificar int
 )
 begin
+    declare e_id int;
+    declare u_id int;
+
+    select id_gerente into e_id from departamentos where id_departamento = d_id limit 1;
+    select id_usuario into u_id from empleado where id_empleado = e_id limit 1;
+
     update departamentos
     set id_gerente = null
     where id_departamento = d_id;
+
+    update usuario
+    set permiso = 1
+    where id_usuario = u_id;
 
 end$$
 delimiter ;
