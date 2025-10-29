@@ -21,14 +21,24 @@ import servicios.ExportarRegistro as ExportarRegistro
 
 #Crear conexion con base de datos
 def conexionsql():
-    conexion = mysql.connector.connect(
-        host="127.0.0.1",
-        port=3306,
-        user="root",
-        #password="",
-        database="gestemp_ecotech"
-    )
-    return conexion
+    connect = 0
+    while connect == 0:
+        try:
+            screen.clear()
+            print("Conectando...")
+            conexion = mysql.connector.connect(
+                host="127.0.0.1",
+                port=3306,
+                user="root",
+                #password="",
+                database="gestemp_ecotech"
+            )
+            time.sleep(1)
+            connect = 1
+            return conexion
+        except Exception:
+            print("Error al conectarse a la base de datos")
+            input("Presione [ENTER] para reintentar")
 
 def mostrar_menu(nombre,permiso):
     screen.clear()
