@@ -77,7 +77,7 @@ def menu_gestion_proyecto(connect):
                 cursor.close()
                 conexion.commit()
                 print(tabla)
-                print("proyecto creado correctamente!")
+                print("Proyecto creado correctamente!")
                 time.sleep(2)
             except mysql.connector.errors.Error as error:
                 print("Error: ",error)

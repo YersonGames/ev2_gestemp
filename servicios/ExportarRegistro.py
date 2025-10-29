@@ -30,8 +30,9 @@ def exportar_registro(connect):
                 hoja.write(columna,0,desencriptar(l[1]))
             if l[2] != None:
                 hoja.write(columna,1,str(datetime.timedelta(seconds=l[2])))
-            date = datetime.datetime.strftime(l[3],"%Y-%m")
-            hoja.write(columna,2,date)
+            if l[3] != None:
+                date = datetime.datetime.strftime(l[3],"%Y-%m")
+                hoja.write(columna,2,date)
             columna += 1
     hoja.add_table(0,0,columna,2,{'columns': [{'header': 'Empleados'},{'header': 'Horas Trabajadas Empleados'},{'header': 'Fecha'}]})
 
@@ -63,5 +64,5 @@ def exportar_registro(connect):
     hoja.autofit()
     file.close()
 
-    print("El registro 'Registro.xlsx' exportado correctamento!")
+    print("El registro 'Registro.xlsx' exportado correctamente!")
     time.sleep(2)

@@ -139,7 +139,7 @@ def main():
                 if opcion == "1":
                     RegistrarHora.registrar_horas(conexion,verificar_login[2])
                 elif opcion == "2":
-                    fecha = input("Formato (XXXX-XX) Año-Mes\nIngresar Fecha de Resgistros: ")
+                    fecha = input("Formato (XXXX-XX) Año-Mes\nIngresar Fecha del Registro: ")
                     patron = re.compile(r"^\d\d\d\d-\d\d$", re.IGNORECASE)
                     patron2 = patron.match(fecha)
 

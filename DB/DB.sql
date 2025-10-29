@@ -36,7 +36,7 @@ create table if not exists empleado_registro(
 -- Admin
 delete from usuario where id_usuario = 1;
 insert into usuario(id_usuario,nombre,direccion,telefono,email,run,contrasenahash,permiso,activo)
-values (1,"QWRtaW4=","","","","MjIuMTk4LjgyMy0w","5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",3,1);
+values (1,"QWRtaW4=","","","","MDAuMDAwLjAwMC0w","8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",3,1);
 
 -- Funcion registrar Usuario/Empleado
 drop procedure if exists sp_empleado_registrar;

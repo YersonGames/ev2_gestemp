@@ -26,7 +26,7 @@ def registrar_horas(connect,id_usuario):
 
         #Registrar hora fin
         while step == 2:
-            hora2 = input("Formato (XX:XX) 24hrs\nIngresar Hora Fin: ")
+            hora2 = input("Ingresar Hora Fin: ")
             patron = re.compile(r"^\d\d:\d\d$", re.IGNORECASE)
             patron2 = patron.match(hora1)
             verificar = hora2.split(":")
