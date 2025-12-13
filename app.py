@@ -119,23 +119,26 @@ def main():
                 cursor = conexion.cursor()
                 verificar_login = cursor.callproc("sp_usuario_login",parametros)
                 cursor.close()
+                if verificar_login[2] > 0:
+                    iteraciones = int(verificar_login[6])
+                    sal = base64.b64decode(verificar_login[5])
+                    hash_b = base64.b64decode(verificar_login[1])
 
-                iteraciones = int(verificar_login[6])
-                sal = base64.b64decode(verificar_login[5])
-                hash_b = base64.b64decode(verificar_login[1])
-
-                new_hash_b = hashlib.pbkdf2_hmac("sha256", contrasena.encode("utf-8"), sal, iteraciones  )
-                resultado = secrets.compare_digest(hash_b,new_hash_b )
-                if verificar_login[2] > 0 and verificar_login[3] > 0 and resultado:
-                    input(f"Haz iniciado sesion como {desencriptar(verificar_login[4])}, \nPresione [ENTER] para continuar")
-                    permiso = verificar_login[3]
-                    nombre_usuario = verificar_login[4]
-                    login = 0
-                    step = 0
-                    salir = 1
+                    new_hash_b = hashlib.pbkdf2_hmac("sha256", contrasena.encode("utf-8"), sal, iteraciones  )
+                    resultado = secrets.compare_digest(hash_b,new_hash_b )
+                    if verificar_login[2] > 0 and verificar_login[3] > 0 and resultado:
+                        input(f"Haz iniciado sesion como {desencriptar(verificar_login[4])}, \nPresione [ENTER] para continuar")
+                        permiso = verificar_login[3]
+                        nombre_usuario = verificar_login[4]
+                        login = 0
+                        step = 0
+                        salir = 1
+                    else:
+                        input("Error al iniciar sesion, presione [ENTER] para reintentar")
+                        step = 0
                 else:
-                    input("Error al iniciar sesion, presione [ENTER] para reintentar")
-                    step = 0
+                        input("Error al iniciar sesion, presione [ENTER] para reintentar")
+                        step = 0
 
         while salir == 1:
             if permiso == 3:
