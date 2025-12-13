@@ -1,5 +1,9 @@
 import re
 import hashlib
+import secrets
+import base64
+import random
+from pwinput import pwinput
 
 #Servicio
 import servicios.LimpiarPantalla as screen
@@ -68,14 +72,22 @@ def modificardatos(opcion,datos):
     
     #Ingresar Contrasena
     while step == "6":
-        contrasena = input("Contraseña: ").strip()
+        contrasena = pwinput("Contraseña: ").strip()
         if not contrasena:
             print("Error: El campo esta vacio")
         else:
-            data = contrasena.encode("utf-8")
-            contrasenahash = hashlib.sha256()
-            contrasenahash.update(data)
-            contrasenahash2 = contrasenahash.hexdigest()
+            repeat_pass = pwinput("Repita la contraseña: ")
+
+            if repeat_pass == contrasena:
+                sal = secrets.token_bytes(16)
+                sal_64 = base64.b64encode(sal).decode() 
+
+                iteraciones = random.randrange(100_000,200_000)
+                hash_b = hashlib.pbkdf2_hmac("sha256", contrasena.encode("utf-8"), sal, iteraciones  )
+                hash_b64 = base64.b64encode(hash_b).decode()
+                step = 0
+            else:
+                print("Contraseña incorrecta!\n")
             step = 0
 
     #Ingresar RUN
@@ -90,5 +102,5 @@ def modificardatos(opcion,datos):
         else:
             step = 3
             
-    data = [nombre,direccion,telefono,email,run,contrasenahash2,permiso,fechahoy,salario]
+    data = [nombre,direccion,telefono,email,run,hash_b64,permiso,fechahoy,salario,sal_64,iteraciones]
     return data

@@ -62,7 +62,7 @@ def menu_gestion_empleado(connect):
                 empleado = Empleado(datos[0],datos[1],datos[2],datos[3],datos[4],datos[5],datos[6],datos[7],datos[8])
                 tabla.add_row([empleado.get_nombre(),empleado.get_direccion(),empleado.get_telefono(),empleado.get_email(),empleado.get_run(),empleado.get_permiso(),empleado.get_fecha_inicio(),empleado.get_salario()])
 
-                parametros = (encriptar(empleado.get_nombre()),encriptar(empleado.get_direccion()),encriptar(empleado.get_telefono()),encriptar(empleado.get_email()),encriptar(empleado.get_run()),empleado.get_contrasenahash(),empleado.get_permiso(),empleado.get_fecha_inicio(),empleado.get_salario())
+                parametros = (encriptar(empleado.get_nombre()),encriptar(empleado.get_direccion()),encriptar(empleado.get_telefono()),encriptar(empleado.get_email()),encriptar(empleado.get_run()),empleado.get_contrasenahash(),empleado.get_permiso(),empleado.get_fecha_inicio(),empleado.get_salario(),datos[9],datos[10])
                 cursor = conexion.cursor()
                 cursor.callproc("sp_empleado_registrar",parametros)
                 cursor.close()
@@ -100,7 +100,7 @@ def menu_gestion_empleado(connect):
                     if opcion != "0":
                         data = ModificarEmpleado.modificardatos(opcion,datos)
                         empleado = Empleado(data[0],data[1],data[2],data[3],data[4],data[5],data[6],data[7],data[8])
-                        parametrosempleado = (encriptar(empleado.get_nombre()),encriptar(empleado.get_direccion()),encriptar(empleado.get_telefono()),encriptar(empleado.get_email()),encriptar(empleado.get_run()),empleado.get_contrasenahash(),empleado.get_permiso(),empleado.get_fecha_inicio(),empleado.get_salario(),verificar[-1])
+                        parametrosempleado = (encriptar(empleado.get_nombre()),encriptar(empleado.get_direccion()),encriptar(empleado.get_telefono()),encriptar(empleado.get_email()),encriptar(empleado.get_run()),empleado.get_contrasenahash(),empleado.get_permiso(),empleado.get_fecha_inicio(),empleado.get_salario(),verificar[-1],data[9],data[10])
                         cursor = conexion.cursor()
                         cursor.callproc("sp_empleado_modificar_id",parametrosempleado)
                         cursor.close()

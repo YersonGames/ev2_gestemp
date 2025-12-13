@@ -11,7 +11,9 @@ create table if not exists usuario(
     run varchar(20),
     contrasenahash varchar(255),
     permiso int not null,
-    activo tinyint(1) not null default 1
+    activo tinyint(1) not null default 1,
+    sal text,
+    iteraciones text
 );
 
 
@@ -35,8 +37,8 @@ create table if not exists empleado_registro(
 
 -- Admin
 delete from usuario where id_usuario = 1;
-insert into usuario(id_usuario,nombre,direccion,telefono,email,run,contrasenahash,permiso,activo)
-values (1,"QWRtaW4=","","","","MDAuMDAwLjAwMC0w","8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",3,1);
+insert into usuario(id_usuario,nombre,direccion,telefono,email,run,contrasenahash,permiso,activo,sal,iteraciones)
+values (1,"QWRtaW4=","","","","MDAuMDAwLjAwMC0w","PdpvPEQn7GGBK05WwKoaRnq/18DLQN0tyZc3BW19FVg=",3,1,"xC+wa13XqlP2OfvOUpJW9A==","126292");
 
 -- Funcion registrar Usuario/Empleado
 drop procedure if exists sp_empleado_registrar;
@@ -51,7 +53,9 @@ create procedure sp_empleado_registrar(
     in u_contrasenahash varchar(255),
     in u_permiso int,
     in u_fecha_inicio date,
-    in u_salario decimal(12,2)
+    in u_salario decimal(12,2),
+    in u_sal text,
+    in u_iter int
 )
 begin
     declare u_id int;
@@ -63,8 +67,8 @@ begin
 
     if u_id is null then
         if u_adid is null then
-            insert into usuario(nombre, direccion, telefono, email,run,contrasenahash,permiso,activo)
-            values (u_nombre, u_direccion, u_telefono,u_email,u_run,u_contrasenahash,u_permiso,1);
+            insert into usuario(nombre, direccion, telefono, email,run,contrasenahash,permiso,activo,sal,iteraciones)
+            values (u_nombre, u_direccion, u_telefono,u_email,u_run,u_contrasenahash,u_permiso,1,u_sal,u_iter);
 
             set u_tid = LAST_INSERT_ID();
             insert into empleado(id_usuario,fecha_inicio,salario)
@@ -158,7 +162,7 @@ drop procedure if exists sp_empleado_verificar_run;
 
 delimiter $$
 create procedure sp_empleado_verificar_run(
-    in u_run varchar(20),
+    in u_run varchar(100),
     out verificar int)
 begin
     declare u_id int;
@@ -197,9 +201,11 @@ drop procedure if exists sp_empleado_get_id;
 
 delimiter $$
 create procedure sp_empleado_get_id(
-    in u_id varchar(20),
+    in e_id varchar(20),
     out verificar int)
 begin
+    declare u_id int;
+        select id_usuario into u_id from empleado where id_empleado = e_id limit 1;
 
         select  u.nombre,
                 u.direccion,
@@ -411,11 +417,13 @@ create procedure sp_empleado_modificar_id(
     in u_permiso int,
     in u_fecha_inicio date,
     in u_salario decimal(12,2),
-    in u_id int
+    in e_id int,
+    in u_sal text,
+    in u_iter int
 )
 begin
-
-    
+    declare u_id int;
+    select id_usuario into u_id from empleado where id_empleado = e_id limit 1;
         update usuario
         set nombre = u_nombre,
             direccion  = u_direccion,
@@ -424,7 +432,9 @@ begin
             run = u_run,
             contrasenahash = u_contrasenahash,
             permiso = u_permiso,
-            activo = 1
+            activo = 1,
+            sal = u_sal,
+            iteraciones = u_iter
         where id_usuario = u_id;
 
         update empleado
@@ -442,34 +452,50 @@ delimiter $$
 
 create procedure sp_usuario_login(
     in u_run text,
-    in u_contrasenahash text,
+    out u_contrasenahash text,
     out verificar_id int,
     out verificar_permiso int,
-    out verificar_nombre text
+    out verificar_nombre text,
+    out verificar_sal text,
+    out verificar_iter text
 )
 begin
 
     declare u_id int;
     declare u_per int;
     declare u_nom text;
+    declare u_sal text;
+    declare u_iter text;
+    declare u_con text;
 
     select id_usuario into u_id from usuario where run = u_run limit 1;
-    select permiso into u_per from usuario where contrasenahash = u_contrasenahash limit 1;
+    select permiso into u_per from usuario where run = u_run limit 1;
     select nombre into u_nom from usuario where run = u_run limit 1;
+    select sal into u_sal from usuario where run = u_run limit 1;
+    select iteraciones into u_iter from usuario where run = u_run limit 1;
+    select contrasenahash into u_con from usuario where run = u_run limit 1;
+    
 
 
     if u_id is not null then
 
-        if u_per is not null then
+        -- if u_per is not null then
 
-            set verificar_id = u_id;
-            set verificar_permiso = u_per;
-            set verificar_nombre = u_nom;
+        set verificar_id = u_id;
+        set verificar_permiso = u_per;
+        set verificar_nombre = u_nom;
+        set verificar_sal = u_sal;
+        set verificar_iter = u_iter;
+        set u_contrasenahash = u_con;
+        
+            /*
         else
             set verificar_id = -1;
             set verificar_permiso = -1;
             set verificar_nombre = "Error";
+            
         end if;
+        */
 
     else
             set verificar_id = -1;

@@ -4,7 +4,9 @@ import hashlib
 import re
 import time
 import datetime
-from getpass import getpass
+import base64
+import secrets
+from pwinput import pwinput
 
 #Clases
 from clases.empleado import Empleado
@@ -14,6 +16,7 @@ from clases.usuario import Usuario
 import MenuGestionEmpleado
 import MenuGestionDepartamento
 import MenuGestionProyecto
+import MenuGestionViajes
 import servicios.LimpiarPantalla as screen
 from servicios.EncriptarDesencriptar import encriptar,desencriptar
 import servicios.RegistrarHora as RegistrarHora
@@ -57,7 +60,8 @@ def mostrar_menu(nombre,permiso):
                         [1,"Gestionar Empleados"],
                         [2,"Gestionar Departamentos"],
                         [3,"Gestionar Proyectos"],
-                        [4,"Exportar Registro"],
+                        #[4,"Gestionar Viajes"],
+                        [5,"Exportar Registro"],
                         [0,"Salir"]
                     ])
     elif permiso == 1 or permiso == 2:
@@ -94,7 +98,7 @@ def main():
                     step = 2
             
             while step == 2:
-                contrasena = getpass("Contraseña: ").strip()
+                contrasena = pwinput("Contraseña: ").strip()
                 if not contrasena and contrasena.lower() != "salir":
                     print("El campo esta vacio")
                 elif contrasena.lower() == "salir":
@@ -110,12 +114,19 @@ def main():
                 contrasenahash = hashlib.sha256()
                 contrasenahash.update(data)
 
-                parametros = (encriptar(run),contrasenahash.hexdigest(),-1,-1,"Nombre")
+                parametros = (encriptar(run),contrasenahash.hexdigest(),-1,-1,"Nombre",-1,-1)
 
                 cursor = conexion.cursor()
                 verificar_login = cursor.callproc("sp_usuario_login",parametros)
                 cursor.close()
-                if verificar_login[2] > 0 and verificar_login[3] > 0:
+
+                iteraciones = int(verificar_login[6])
+                sal = base64.b64decode(verificar_login[5])
+                hash_b = base64.b64decode(verificar_login[1])
+
+                new_hash_b = hashlib.pbkdf2_hmac("sha256", contrasena.encode("utf-8"), sal, iteraciones  )
+                resultado = secrets.compare_digest(hash_b,new_hash_b )
+                if verificar_login[2] > 0 and verificar_login[3] > 0 and resultado:
                     input(f"Haz iniciado sesion como {desencriptar(verificar_login[4])}, \nPresione [ENTER] para continuar")
                     permiso = verificar_login[3]
                     nombre_usuario = verificar_login[4]
@@ -138,7 +149,9 @@ def main():
                     MenuGestionDepartamento.menu_gestion_departamento(conexion)
                 elif opcion == "3":
                     MenuGestionProyecto.menu_gestion_proyecto(conexion)
-                elif opcion == "4":
+                elif opcion == "inhabilitado":
+                    MenuGestionViajes.menu_gestion_viajes(conexion)
+                elif opcion == "5":
                     ExportarRegistro.exportar_registro(conexion)
                 elif opcion == "0":
                     salir = 0

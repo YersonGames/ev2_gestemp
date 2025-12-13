@@ -1,7 +1,10 @@
 import re
 import hashlib
 import datetime
-from getpass import getpass
+import secrets
+import base64
+import random
+from pwinput import pwinput
 
 #Servicio
 import servicios.LimpiarPantalla as screen
@@ -71,16 +74,19 @@ def registrardatos():
     
     #Ingresar Contrasena
     while step == 7:
-        contrasena = getpass("Contraseña: ").strip()
+        contrasena = pwinput("Contraseña: ").strip()
         if not contrasena:
             print("Error: El campo esta vacio")
         else:
-            repeat_pass = getpass("Repita la contraseña: ")
+            repeat_pass = pwinput("Repita la contraseña: ")
 
             if repeat_pass == contrasena:
-                data = contrasena.encode("utf-8")
-                contrasenahash = hashlib.sha256()
-                contrasenahash.update(data)
+                sal = secrets.token_bytes(16)
+                sal_64 = base64.b64encode(sal).decode() 
+
+                iteraciones = random.randrange(100_000,200_000)
+                hash_b = hashlib.pbkdf2_hmac("sha256", contrasena.encode("utf-8"), sal, iteraciones  )
+                hash_b64 = base64.b64encode(hash_b).decode()
                 step = 0
             else:
                 print("Contraseña incorrecta!\n")
@@ -88,5 +94,5 @@ def registrardatos():
     fecha = datetime.datetime.now()
     fechahoy = f"{fecha.year}-{fecha.month}-{fecha.day}"
     screen.clear()
-    datos = [nombre,direccion,telefono,email,run,contrasenahash.hexdigest(),1,fechahoy,salario]
+    datos = [nombre,direccion,telefono,email,run,hash_b64,1,fechahoy,salario,sal_64,iteraciones]
     return datos
