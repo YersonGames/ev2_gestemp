@@ -61,7 +61,7 @@ def mostrar_menu(nombre,permiso):
                         [2,"Gestionar Departamentos"],
                         [3,"Gestionar Proyectos"],
                         #[4,"Gestionar Viajes"],
-                        [5,"Exportar Registro"],
+                        [4,"Exportar Registro"],
                         [0,"Salir"]
                     ])
     elif permiso == 1 or permiso == 2:
@@ -154,7 +154,7 @@ def main():
                     MenuGestionProyecto.menu_gestion_proyecto(conexion)
                 elif opcion == "inhabilitado":
                     MenuGestionViajes.menu_gestion_viajes(conexion)
-                elif opcion == "5":
+                elif opcion == "4":
                     ExportarRegistro.exportar_registro(conexion)
                 elif opcion == "0":
                     salir = 0
