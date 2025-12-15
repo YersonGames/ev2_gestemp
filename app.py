@@ -16,7 +16,6 @@ from clases.usuario import Usuario
 import MenuGestionEmpleado
 import MenuGestionDepartamento
 import MenuGestionProyecto
-import MenuGestionViajes
 import servicios.LimpiarPantalla as screen
 from servicios.EncriptarDesencriptar import encriptar,desencriptar
 import servicios.RegistrarHora as RegistrarHora
@@ -60,7 +59,6 @@ def mostrar_menu(nombre,permiso):
                         [1,"Gestionar Empleados"],
                         [2,"Gestionar Departamentos"],
                         [3,"Gestionar Proyectos"],
-                        #[4,"Gestionar Viajes"],
                         [4,"Exportar Registro"],
                         [0,"Salir"]
                     ])
@@ -152,8 +150,6 @@ def main():
                     MenuGestionDepartamento.menu_gestion_departamento(conexion)
                 elif opcion == "3":
                     MenuGestionProyecto.menu_gestion_proyecto(conexion)
-                elif opcion == "inhabilitado":
-                    MenuGestionViajes.menu_gestion_viajes(conexion)
                 elif opcion == "4":
                     ExportarRegistro.exportar_registro(conexion)
                 elif opcion == "0":
